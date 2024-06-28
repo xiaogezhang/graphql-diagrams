@@ -7,7 +7,8 @@ import {ClickableTextWidget} from './ClickableTextWidget';
 export const SimpleTextListItemType: string = 'SimpleTextListItem';
 
 export class SimpleTextListItem extends ListItemModel<ClickableText> {
-  constructor(content?: ClickableText) {
+
+  constructor(content?: ClickableText, backgroundColor? :string) {
     super(SimpleTextListItemType);
     this.content = content;
   }
@@ -16,12 +17,23 @@ export class SimpleTextListItem extends ListItemModel<ClickableText> {
     return this.content;
   }
 
-  deserializeContent(event: DeserializeEvent<BaseEntity>, data: any): ClickableText {
+  deserializeContent(
+    event: DeserializeEvent<BaseEntity>,
+    data: any,
+  ): ClickableText {
     return data as ClickableText;
   }
 
   renderContent(): JSX.Element {
-    const onClick = () => this.unselectNode() ;
-    return this.content ? <ClickableTextWidget content={this.content} onClick={onClick}/> : <div/>;
+    const onClick = () => this.unselectNode();
+    return this.content ? (
+      <ClickableTextWidget content={this.content} onClick={onClick} />
+    ) : (
+      <div />
+    );
+  }
+
+  getBackgroundColor(): string | undefined {
+    return this.content?.backgroundColor;
   }
 }

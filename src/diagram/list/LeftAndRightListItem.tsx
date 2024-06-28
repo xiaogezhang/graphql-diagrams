@@ -42,9 +42,12 @@ export type LeftAndRight = {
 };
 
 export class LeftAndRightListItem extends ListItemModel<LeftAndRight> {
-  constructor(content?: LeftAndRight) {
+  private backgroundColor?: string;
+
+  constructor(content?: LeftAndRight, backgroundColor?: string) {
     super(LeftAndRightListItemType);
     this.content = content;
+    this.backgroundColor = backgroundColor;
   }
 
   serializeContent(): any {
@@ -64,9 +67,38 @@ export class LeftAndRightListItem extends ListItemModel<LeftAndRight> {
     const onClick = () => this.unselectNode();
     return (
       <S.Row>
-        {left && <S.Left><ClickableTextWidget content={left} onClick={onClick}/></S.Left>}
-        {right && <S.Right><ClickableTextWidget content={right} onClick={onClick}/></S.Right>}
+        {left && (
+          <S.Left>
+            <ClickableTextWidget content={left} onClick={onClick} />
+          </S.Left>
+        )}
+        {right && (
+          <S.Right>
+            <ClickableTextWidget content={right} onClick={onClick} />
+          </S.Right>
+        )}
       </S.Row>
     );
+  }
+
+  doClone(lookupTable: {}, clone: any): void {
+    super.doClone(lookupTable, clone);
+    clone.backgroundColor = this.backgroundColor;
+  }
+
+  serialize() {
+    return {
+      ...super.serialize(),
+      backgroundColor: this.backgroundColor,
+    };
+  }
+
+  deserialize(event: DeserializeEvent<this>) {
+    super.deserialize(event);
+    this.backgroundColor = event.data.backgroundColor;
+  }
+
+  getBackgroundColor(): string | undefined {
+    return this.backgroundColor;
   }
 }

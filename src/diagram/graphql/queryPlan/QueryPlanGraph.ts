@@ -16,11 +16,14 @@ import {
   ParallelNode,
   PlanNode,
   QueryPlan,
+  QueryPlanFieldNode,
+  QueryPlanInlineFragmentNode,
+  QueryPlanSelectionNode,
   SequenceNode,
   SubscriptionNode,
 } from '@apollo/query-planner';
 import {TreeNode, layout} from '../../layout';
-import {DocumentNode, Kind, SelectionSetNode, parse, print, visit} from 'graphql';
+import {DocumentNode, Kind, parse, print, visit} from 'graphql';
 import {
   MultiLineText,
   MultiLineTextListItemType,
@@ -39,7 +42,9 @@ const ParallelNodeColor: string = 'Cyan';
 const ConditionNodeColor: string = tinycolor('LightCyan')
   .lighten(15)
   .toRgbString();
-const FetchNodeColor: string = 'LightGreen';
+const FetchNodeColor: string = 'LimeGreen';
+const VariablesColor: string = 'MediumSeaGreen'; //tinycolor(FetchNodeColor).lighten(20);
+const RequireBackGroundColor: string = 'LightGreen';
 const FlattenNodeColor: string = tinycolor('LightGreen')
   .lighten(15)
   .toRgbString();
@@ -285,48 +290,52 @@ function processFetchNode(
     if (maxWidth < 17) {
       maxWidth = 17;
     }
-    const varsStr = '        [' + node.variableUsages.join(', ') + ']';
-    varsLines.push(varsStr);
+    node.variableUsages.forEach(variable => {
+      varsLines.push(singleIndent + singleIndent + variable);
+      if (variable.length + 4 > maxWidth) {
+        maxWidth = variable.length + 4;
+      }
+    });
     const varsContent: MultiLineText = {
       content: varsLines,
-      backgroundColor: FetchNodeColor,
-      initNumberOfRows: 2,
+      backgroundColor: VariablesColor,
+      initNumberOfRows: 3,
     };
     varsRow?.setContent(varsContent);
     if (curParentTreeNode) {
-      curParentTreeNode.rowsCount += node.variableUsages.length + 2;
-    }
-    if (varsStr.length > maxWidth) {
-      maxWidth = varsStr.length;
+      curParentTreeNode.rowsCount += node.variableUsages.length + 1;
     }
   }
-  /*
-  if (node.requires && node.requires.length > 0) {
-    const requires: SelectionSetNode = { kind: Kind.SELECTION_SET, selections: node.requires };
+
+  const requires: QueryPlanSelectionNode[] | undefined = node.requires;
+  
+  if (requires && requires.length > 0 && curParent.treeNode) {
+    const selections = ['Requires: '];
+    selections.push('{');
+    selections.push(...printQueryPlanSelections(singleIndent, requires));
+    selections.push('}');
     const requiresRow = curParent.treeNode.node.createItem(MultiLineTextListItemType);
-    const requiresStr = print(requires);
-    const requiresLines = requiresStr.split(/\r?\n/);
     const requiresContent: MultiLineText = {
-      content: requiresLines,
-      backgroundColor: FetchNodeColor,
+      content: selections,
+      backgroundColor: RequireBackGroundColor,
       initNumberOfRows: 3,
     };
-    for (let i = 0; i < 3 && i < requiresLines.length; i++) {
-      if (maxWidth < requiresLines[i].length) {
-        maxWidth = requiresLines[i].length;
+    for (let i = 0; i < 3 && i < selections.length; i++) {
+      if (maxWidth < selections[i].length) {
+        maxWidth = selections[i].length;
       }
     }
     requiresRow.setContent(requiresContent);
     curParent.treeNode.rowsCount += 3;
   }
-    */
+    
   const row = curParentTreeNode?.node.createItem(MultiLineTextListItemType);
   const operationStr = print(flattenEntitiesField(parse(node.operation)));
   const lines = operationStr.split(/\r?\n/);
   const content: MultiLineText = {
     content: lines,
     backgroundColor: FetchNodeColor,
-    initNumberOfRows: 15,
+    initNumberOfRows: 12,
   };
   for (let i = 0; i < 15 && i < lines.length; i++) {
     if (maxWidth < lines[i].length) {
@@ -587,4 +596,50 @@ function flattenEntitiesField(node: DocumentNode): DocumentNode {
       return selectionSet;
     },
   });
+}
+
+const singleIndent = '  ';
+
+function printQueryPlanSelection(indent: string, selection: QueryPlanSelectionNode): string[] {
+  switch (selection.kind) {
+    case 'Field':
+      return printQueryPlanField(indent, selection as QueryPlanFieldNode);
+    case 'InlineFragment':
+      return printQueryPlanInlineFragment(indent, selection as QueryPlanInlineFragmentNode);
+ }
+}
+
+function printQueryPlanField(indent: string, field: QueryPlanFieldNode): string[] {
+  const result: string[] = [];
+  const fieldStr = indent + field.name + (field.alias ? (' as ' + field.alias) : '');
+  if (field.selections) {
+    result.push(fieldStr + ' {');
+    const children = printQueryPlanSelections(indent + singleIndent, field.selections);
+    result.push(...children);
+    result.push(indent + '}');
+  } else {
+    result.push(fieldStr);
+  }
+  return result;
+}
+
+function printQueryPlanInlineFragment(indent: string, fragment: QueryPlanInlineFragmentNode): string[] {
+  const result: string[] = [];
+  result.push(fragment.typeCondition? (indent + fragment.typeCondition + ' {') : '{');
+  const children = printQueryPlanSelections(indent + singleIndent, fragment.selections);
+  result.push(...children);
+  result.push(indent + '}');
+  return result;
+}
+
+function printQueryPlanSelections(indent: string, selections?: QueryPlanSelectionNode[]): string[] {
+  const result: string[] = [];
+  if (!selections || selections.length === 0) {
+    return result;
+  }
+  selections.forEach(selection => {
+    const children = printQueryPlanSelection(indent, selection);
+    result.push(...children);
+  });
+  return result;
 }

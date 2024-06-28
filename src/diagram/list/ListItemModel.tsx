@@ -108,6 +108,8 @@ export abstract class ListItemModel<
     return this.getID();
   }
 
+  abstract getBackgroundColor(): string | undefined;
+
   abstract serializeContent(): any;
   abstract deserializeContent(
     event: DeserializeEvent<BaseEntity>,

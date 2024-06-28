@@ -30,6 +30,14 @@ export class MultiLineTextListItem extends ListItemModel<MultiLineText> {
   }
 
   renderContent(): JSX.Element {
-    return this.content ? <MultiLineTextWidget key={this.getID()} content={this.content}/> : <div/>;
+    return this.content ? (
+      <MultiLineTextWidget key={this.getID()} content={this.content} />
+    ) : (
+      <div />
+    );
+  }
+
+  getBackgroundColor(): string | undefined {
+    return this.content?.backgroundColor;
   }
 }

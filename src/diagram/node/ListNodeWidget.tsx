@@ -52,7 +52,8 @@ namespace S {
     background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
   `;
 
-  export const Item = styled.div`
+  export const Item = styled.div<{background: string | undefined}>`
+    background-color: ${(p) => p.background};
     display: flex;
     margin-top: 1px;
     align-items: center;
@@ -85,7 +86,7 @@ export default function ListNodeWidget(props: ListNodeProps) {
   const createItem = (item: ListItemModel<any>, index) => {
     return (
       <>
-        <S.Item key={index}>
+        <S.Item key={index} background={item.getBackgroundColor()}>
           <WithInOutPortsWidget model={item} engine={engine}>
             {item.renderContent()}
           </WithInOutPortsWidget>
