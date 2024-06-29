@@ -21,6 +21,9 @@ export interface ListItemModelGenerics extends BaseModelGenerics {
   PARENT: BaseModel;
 }
 
+/**
+ * Model to represent an item in a list. 
+ */
 export abstract class ListItemModel<
     T,
     G extends ListItemModelGenerics = ListItemModelGenerics,

@@ -4,7 +4,7 @@ import {DiagramEngine, PortWidget} from '@projectstorm/react-diagrams-core';
 import styled from '@emotion/styled';
 import { WithInOutPorts } from './WithInOutPorts';
 
-namespace S {
+namespace Styled {
   export const Port = styled.div`
     width: 8px;
     height: 16px;
@@ -27,25 +27,31 @@ export interface WithInOutPortsWidgetProps {
   engine: DiagramEngine;
 }
 
+/**
+ * Wrap a widget with input(left) or/and output(right) ports
+ * 
+ * @param props model that has in/out ports
+ * @returns 
+ */
 export function WithInOutPortsWidget (props: React.PropsWithChildren<WithInOutPortsWidgetProps>) {
   const {model, engine, children} = props;
   const inPort = model.getInPort();
   const leftPort =
     model.isInPortEnabled() && inPort ? (
       <PortWidget engine={engine} port={inPort} key="left">
-        <S.Port>&#10547;</S.Port>
+        <Styled.Port>&#10547;</Styled.Port>
       </PortWidget>
     ) : (
-      <S.DisabledPort key="left"/>
+      <Styled.DisabledPort key="left"/>
     );
   const outPort = model.getOutPort();
   const rightPort =
     model.isOutPortEnabled() && outPort ? (
       <PortWidget engine={engine} port={outPort} key="right">
-        <S.Port>&#10555;</S.Port>
+        <Styled.Port>&#10555;</Styled.Port>
       </PortWidget>
     ) : (
-      <S.DisabledPort key="right"/>
+      <Styled.DisabledPort key="right"/>
     );
   return (
     <>

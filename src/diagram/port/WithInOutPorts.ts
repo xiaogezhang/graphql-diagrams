@@ -1,5 +1,8 @@
 import {PortModel} from '@projectstorm/react-diagrams';
 
+/**
+ * Models with input or/and output ports. Such as an item, a node etc
+ */
 export interface WithInOutPorts {
   isInPortEnabled(): boolean;
 

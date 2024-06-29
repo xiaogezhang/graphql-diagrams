@@ -43,12 +43,17 @@ export class ListNodeModel extends DefaultNodeModel implements WithInOutPorts {
     super({
       type: ListNodeModelType,
       name: 'Untitled',
-      color: 'rgb(0,192,255)',
+      color: 'DeepSkyBlue',
       ...options,
     });
     this.items = [];
   }
 
+  /** 
+   * Port is where a link can connect to. A node can own many ports. 
+   * 
+   * Remove the port if it belongs to this node.
+  **/ 
   removePort(port: DefaultPortModel): void {
     const items = this.getItems();
     items.forEach((item) => {

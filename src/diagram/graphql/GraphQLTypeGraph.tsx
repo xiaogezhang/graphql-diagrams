@@ -29,7 +29,8 @@ import {
 import {typeDisplayName} from './GraphQLTypeUtils';
 import {TargetType} from '../list/ClickableText';
 import {TypeGraphOptions} from './GraphQLDiagramContext';
-import { TreeNode, layout } from '../layout';
+import {TreeNode, layout} from '../layout';
+import { MultiLineText, MultiLineTextListItemType } from '../list/MultiLineTextListItem';
 
 const ErrorNodeColor: string = 'Crimson';
 const TypeNodeColor: string = 'rgb(248, 248, 235)';
@@ -289,12 +290,24 @@ function addImplementsLinks(
   }
 }
 
+/**
+ * Take a GraphQL schema as input, create a diagram model for the UI. 
+ * 
+ * There's one schema node, which has links to meta nodes, such as "Object Types", "Interfaces" etc
+ * 
+ * Each meta node has links (may not show to make canvas cleaner) to corresponding GraphQL elements. 
+ * In each node, there may be fields or other types, and may contain links to them. The links are navigable.
+ * 
+ * @param errors errors when creating this schema. It may be syntax error, parse error, validation error etc. 
+ * @param schema schema passed in. It may be undefined if there's error
+ * @param options 
+ * @returns 
+ */
 export function createTypeGraph(
-  schema: GraphQLSchema,
   errors: ReadonlyArray<GraphQLError>,
+  schema?: GraphQLSchema,
   options?: TypeGraphOptions,
 ): DiagramModel {
-  const schemaConfig = schema?.toConfig();
   const diagramModel = new DiagramModel();
 
   const roots: Array<TreeNode> = [];
@@ -307,21 +320,23 @@ export function createTypeGraph(
     diagramModel.addNode(errorsNode);
     let width = 6;
     errors.forEach((error, idx) => {
-      const row = errorsNode.createItem(SimpleTextListItemType);
-      const locations = error.locations;
-      const locStr = locations
-        ? ' At ' +
-          locations
-            .map((loc) => '(row ' + loc.line + ', column ' + loc.column + ')')
-            .join(', ')
-        : '';
-      row.setContent({
-        label: error.message + locStr,
-        backgroundColor: errorsNode.getOptions().color,
-      });
-      if (error.message.length > width) {
-        width = error.message.length;
+      const errorStr = error.toString();
+      const lines = errorStr.split(/\r?\n/);
+      const content: MultiLineText = {
+        content: lines,
+        backgroundColor: ErrorNodeColor,
+        initNumberOfRows: 10,
+      };
+      for (let i = 0; i < 15 && i < lines.length; i++) {
+        if (width < lines[i].length) {
+          width = lines[i].length;
+        }
       }
+
+      const row = errorsNode.createItem(
+        MultiLineTextListItemType,
+      );
+      row.setContent(content);
     });
     roots.push({
       node: errorsNode,
@@ -335,6 +350,7 @@ export function createTypeGraph(
     layout(roots, startX, startY);
     return diagramModel;
   }
+  const schemaConfig = schema.toConfig();
 
   const createMetaLinks = options?.createMetaLinks ?? false;
   const createInheritanceLinks = options?.createInheritanceLinks ?? false;
