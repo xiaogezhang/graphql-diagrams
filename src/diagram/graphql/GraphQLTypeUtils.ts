@@ -6,6 +6,12 @@ import {
   isNonNullType,
 } from 'graphql/type';
 
+/**
+ * Display a type, if it's nonnullable, add "!" on the right, if it's list, surround with "[]"
+ * 
+ * @param type 
+ * @returns A GraphQL type, usually a named type, or type wrapped around named type
+ */
 export function typeDisplayName(type: GraphQLType): {
   left: string,
   right: string,

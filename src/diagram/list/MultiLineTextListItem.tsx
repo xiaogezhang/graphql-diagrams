@@ -12,6 +12,9 @@ export type MultiLineText = {
   initNumberOfRows?: number;
 };
 
+/**
+ * Model for a list item that has multiple lines of text
+ */
 export class MultiLineTextListItem extends ListItemModel<MultiLineText> {
   constructor(content?: MultiLineText) {
     super(MultiLineTextListItemType);

@@ -5,7 +5,7 @@ import {ListItemModel} from './ListItemModel';
 import {ClickableText } from './ClickableText';
 import {ClickableTextWidget} from './ClickableTextWidget';
 
-namespace S {
+namespace Styled {
   export const Row = styled.div`
     display: flex;
     margin-top: 1px;
@@ -41,6 +41,9 @@ export type LeftAndRight = {
   right?: ClickableText;
 };
 
+/**
+ * Model for UI with a left side text and a right side text. Each side can be clickable.
+ */
 export class LeftAndRightListItem extends ListItemModel<LeftAndRight> {
   private backgroundColor?: string;
 
@@ -66,18 +69,18 @@ export class LeftAndRightListItem extends ListItemModel<LeftAndRight> {
     const right = this.content?.right;
     const onClick = () => this.unselectNode();
     return (
-      <S.Row>
+      <Styled.Row>
         {left && (
-          <S.Left>
+          <Styled.Left>
             <ClickableTextWidget content={left} onClick={onClick} />
-          </S.Left>
+          </Styled.Left>
         )}
         {right && (
-          <S.Right>
+          <Styled.Right>
             <ClickableTextWidget content={right} onClick={onClick} />
-          </S.Right>
+          </Styled.Right>
         )}
-      </S.Row>
+      </Styled.Row>
     );
   }
 

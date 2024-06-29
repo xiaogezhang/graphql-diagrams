@@ -4,8 +4,9 @@ import styled from '@emotion/styled';
 import tinycolor from 'tinycolor2';
 import CanvasContext from '../graphql/CanvasContext';
 import { MultiLineText } from './MultiLineTextListItem';
+import { getTextColor } from '../utils/color';
 
-namespace S {
+namespace Styled {
   export const Lines = styled.div`
     flex-direction: column;
     flex-grow: 1;
@@ -39,26 +40,6 @@ export interface MultiLineTextProps {
   content: MultiLineText;
 }
 
-function getColor(
-  isLink: boolean,
-  color?: string,
-  backgroundColor?: string,
-): string {
-  if (color) {
-    return color;
-  }
-  const defaultColor = isLink ? 'RoyalBlue' : 'White';
-  if (!backgroundColor) {
-    return defaultColor;
-  }
-  const tinyColor = tinycolor(backgroundColor);
-  if (tinyColor.isLight()) {
-    return isLink ? 'Blue' : 'Black';
-  } else {
-    return isLink ? 'DeepSkyBlue' : 'White';
-  }
-}
-
 export function MultiLineTextWidget(props: MultiLineTextProps) {
   const {content} = props;
   const rowLimit = content.initNumberOfRows ?? 20;
@@ -67,25 +48,25 @@ export function MultiLineTextWidget(props: MultiLineTextProps) {
   const lines = expanded ? content.content: content.content.slice(0, rowLimit);
   const color = content.color;
   const backgroundColor = content.backgroundColor;
-  const colorToUse = getColor(false, color, backgroundColor);
-  const colorToUseForLink = getColor(true, color, backgroundColor);
+  const colorToUse = getTextColor(false, color, backgroundColor);
+  const colorToUseForLink = getTextColor(true, color, backgroundColor);
   const canvas = React.useContext(CanvasContext);
   const tinyColor = backgroundColor ? tinycolor(backgroundColor) : null;
   const hoverColor =
     tinyColor && tinyColor.isLight() ? 'RoyalBlue' : 'LightSkyBlue';
   const linesWidget = _map(lines, (line, index) => (
-    <S.Text key={index} color={colorToUse}>{line}</S.Text>
+    <Styled.Text key={index} color={colorToUse}>{line}</Styled.Text>
   ));
   return (
-    <S.Lines>
+    <Styled.Lines>
       {linesWidget}
-      {needExpandLink && <S.ClickableText
+      {needExpandLink && <Styled.ClickableText
         color={colorToUseForLink}
         hoverColor={hoverColor}
         onClick={() => setExpanded(!expanded)}>
           {expanded? 'Collapse' : 'Expand'}
-        </S.ClickableText>
+        </Styled.ClickableText>
       }
-    </S.Lines>
+    </Styled.Lines>
   );
 }

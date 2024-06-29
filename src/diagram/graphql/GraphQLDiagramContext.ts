@@ -12,6 +12,9 @@ export const defaultTypeGraphOptions: TypeGraphOptions = {
   createInputObjectTypes: true,
 };
 
+/**
+ * Context for schema diagram to use within the canvas. Such as display options etc. 
+ */
 const GraphQLDiagramContext = createContext(defaultTypeGraphOptions);
 
 export default GraphQLDiagramContext;

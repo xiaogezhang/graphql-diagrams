@@ -10,7 +10,7 @@ import Canvas from './Canvas';
 import {createQueryPlanGraph} from './graphql/queryPlan/QueryPlanGraph';
 import OutsideClickObserver from './core/hooks';
 
-namespace S {
+namespace Styled {
   export const Canvas = styled(CanvasWidget)<{
     engine: DiagramEngine;
     rows?: number;
@@ -68,8 +68,9 @@ namespace S {
 
 export default function QueryPlanDiagram(props: {
   queryPlan?: string;
+  queryStr?: string,
 }) {
-  const {queryPlan} = props;
+  const {queryPlan, queryStr} = props;
   const [expanded, setExpanded] = useState<boolean>(true);
   const [currentModel, setCurrentModel] = useState<{
     model?: DiagramModel;
@@ -78,7 +79,7 @@ export default function QueryPlanDiagram(props: {
   const [error, setError] = useState<Error | null>(null);
   const generateModel = useCallback((plan) => {
     try {
-      const model = createQueryPlanGraph(plan);
+      const model = createQueryPlanGraph(plan, queryStr);
       const nodes = model.getNodes();
       const nodeCount = nodes.length / 4; 
       setCurrentModel((prevModel) => ({
@@ -90,7 +91,7 @@ export default function QueryPlanDiagram(props: {
         setError(e);
       }
     }
-  }, []);
+  }, [queryStr]);
   useEffect(() => {
     generateModel(queryPlan);
   }, [generateModel, queryPlan]);
@@ -100,22 +101,22 @@ export default function QueryPlanDiagram(props: {
   return currentModel.model ? (
     <OutsideClickObserver
       onClickOutside={(outside) => outside && setExpanded(false)}>
-      <S.Container expanded={expanded}>
-        <S.Header>
+      <Styled.Container expanded={expanded}>
+        <Styled.Header>
           {expanded ? (
-            <S.Button onClick={() => setExpanded(!expanded)}>&#9196;</S.Button>
+            <Styled.Button onClick={() => setExpanded(!expanded)}>&#9196;</Styled.Button>
           ) : (
-            <S.Button onClick={() => setExpanded(!expanded)}>&#9195;</S.Button>
+            <Styled.Button onClick={() => setExpanded(!expanded)}>&#9195;</Styled.Button>
           )}
-          <S.Link>
+          <Styled.Link>
             <a
               href="https://www.apollographql.com/docs/federation/query-plans/"
               rel="noopener"
               target="_blank">
               Doc: Apollo Query Plan
             </a>
-          </S.Link>
-        </S.Header>
+          </Styled.Link>
+        </Styled.Header>
         <Canvas
           model={currentModel.model}
           columns={currentModel.nodeCount}
@@ -123,7 +124,7 @@ export default function QueryPlanDiagram(props: {
           rows={currentModel.nodeCount}
           nodeHeight={150}
         />
-      </S.Container>
+      </Styled.Container>
     </OutsideClickObserver>
   ) : (
     error? errorComponent : loadingComponent

@@ -23,7 +23,16 @@ export const defaultLayoutConfig: LayoutConfig = {
   nodeWidth: 30,
 };
 
-// Basic idea is to use BFS to calculate layout layer by layer.
+/**
+ * Use BFS to traverse the tree/DAG, and calculate a simple layout 
+ * 
+ * @param roots the root or roots of a tree/DAG/forest
+ * @param startX starting X coordinate, increasing with more objects on the canvas.
+ * @param startY similar to startX
+ * @param layoutConfig describe how much to conside for width of characeter, height of a row, gap 
+ *     between nodes etc. These are estimate. If too small the objects may overlap on canvas.
+ *     If too big, the canvas will be too big and consume more memory. Try and adjust.
+ */ 
 export function layout(
   roots: Array<TreeNode>,
   startX: number,

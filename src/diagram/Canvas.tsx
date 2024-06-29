@@ -12,7 +12,7 @@ import GraphQLDiagramContext, {
 } from './graphql/GraphQLDiagramContext';
 import CanvasContext from './graphql/CanvasContext';
 
-namespace S {
+namespace Styled {
   export const Canvas = styled(CanvasWidget)<{
     engine: DiagramEngine;
     rows?: number;
@@ -108,7 +108,7 @@ export default function Canvas(props: {
     <>
       <CanvasContext.Provider
         value={{scrollCanvas: scrollCanvas, canvasModel: model}}>
-        <S.Canvas
+        <Styled.Canvas
           engine={engine}
           columns={columns}
           nodeWidth={nodeWidth}
@@ -117,9 +117,9 @@ export default function Canvas(props: {
         />
       </CanvasContext.Provider>
       {!showOptions ? null : (
-        <S.Float>
-          <S.Label>
-            <S.Checkbox
+        <Styled.Float>
+          <Styled.Label>
+            <Styled.Checkbox
               id="meta-links"
               type="checkbox"
               color="primary"
@@ -133,9 +133,9 @@ export default function Canvas(props: {
               }
             />
             Show Meta Links
-          </S.Label>
-          <S.Label>
-            <S.Checkbox
+          </Styled.Label>
+          <Styled.Label>
+            <Styled.Checkbox
               id="inheritance"
               type="checkbox"
               color="primary"
@@ -149,9 +149,9 @@ export default function Canvas(props: {
               }
             />
             Show Inheritance
-          </S.Label>
-          <S.Label>
-            <S.Checkbox
+          </Styled.Label>
+          <Styled.Label>
+            <Styled.Checkbox
               id="input-object-types"
               type="checkbox"
               color="primary"
@@ -165,8 +165,8 @@ export default function Canvas(props: {
               }
             />
             Show Input Object Types
-          </S.Label>
-        </S.Float>
+          </Styled.Label>
+        </Styled.Float>
       )}
     </>
   );

@@ -6,8 +6,12 @@ import {ListNodeModel} from './ListNodeModel';
 import {ListItemModel} from '../list/ListItemModel';
 import {WithInOutPortsWidget} from '../port/WithInOutPortsWidget';
 
-namespace S {
-  export const Node = styled.div<{background: string | undefined; selected: boolean, grabbing: boolean}>`
+namespace Styled {
+  export const Node = styled.div<{
+    background: string | undefined;
+    selected: boolean;
+    grabbing: boolean;
+  }>`
     background-color: ${(p) => p.background};
     border-radius: 5px;
     font-family: sans-serif;
@@ -18,10 +22,9 @@ namespace S {
     font-size: 11px;
     width: max-content;
     z-index: ${(p) => (p.selected ? 1 : 0)};
-    border: ${(p) =>
-      p.selected ? 'solid 4px OrangeRed' : 'solid 2px black'};
+    border: ${(p) => (p.selected ? 'solid 4px OrangeRed' : 'solid 2px black')};
     &:hover {
-      cursor: ${(p) => p.grabbing? 'grabbing' : 'grab'};
+      cursor: ${(p) => (p.grabbing ? 'grabbing' : 'grab')};
     }
   `;
 
@@ -53,7 +56,8 @@ namespace S {
   `;
 
   export const Item = styled.div<{background: string | undefined}>`
-    background-color: ${(p) => p.background};
+    background-color: ${(p) =>
+      p.background ? p.background : 'rgba(0, 0, 0, 0)'};
     display: flex;
     margin-top: 1px;
     align-items: center;
@@ -85,19 +89,19 @@ export default function ListNodeWidget(props: ListNodeProps) {
   const [grabbing, setGrabbing] = React.useState<boolean>(false);
   const createItem = (item: ListItemModel<any>, index) => {
     return (
-      <>
-        <S.Item key={index} background={item.getBackgroundColor()}>
+      <React.Fragment key={index}>
+        <Styled.Item key={index} background={item.getBackgroundColor()}>
           <WithInOutPortsWidget model={item} engine={engine}>
             {item.renderContent()}
           </WithInOutPortsWidget>
-        </S.Item>
-        <S.HorizontalLine></S.HorizontalLine>
-      </>
+        </Styled.Item>
+        <Styled.HorizontalLine></Styled.HorizontalLine>
+      </React.Fragment>
     );
   };
 
   return (
-    <S.Node
+    <Styled.Node
       data-default-node-name={node.getOptions().name}
       selected={node.isSelected()}
       grabbing={grabbing}
@@ -106,16 +110,12 @@ export default function ListNodeWidget(props: ListNodeProps) {
       onMouseDown={() => setGrabbing(true)}
       onMouseUp={() => setGrabbing(false)}
       background={node.getOptions().color}>
-      <S.Title key="title">
+      <Styled.Title key="title">
         <WithInOutPortsWidget model={node} engine={engine} key="title">
-          <S.TitleName key="titleName">
-            {node.getOptions().name}
-          </S.TitleName>
+          <Styled.TitleName key="titleName">{node.getOptions().name}</Styled.TitleName>
         </WithInOutPortsWidget>
-      </S.Title>
-      <S.Items key="items">
-        {_map(node.getItems(), createItem)}
-      </S.Items>
-    </S.Node>
+      </Styled.Title>
+      <Styled.Items key="items">{_map(node.getItems(), createItem)}</Styled.Items>
+    </Styled.Node>
   );
 }
