@@ -12,7 +12,7 @@ namespace Styled {
     flex-direction: column;
     flex-grow: 1;
     display: flex;
-    width: 350px;
+    max-width: 350px;
     overflow: hidden;
   `;
 
