@@ -25,6 +25,7 @@ import {
 import {TreeNode, layout} from '../../layout';
 import {DocumentNode, Kind, parse, print, visit} from 'graphql';
 import {
+  ClickableTextDict,
   MultiLineText,
   MultiLineTextListItemType,
 } from '../../list/MultiLineTextListItem';
@@ -50,6 +51,7 @@ const QueryPlanNodeColor = 'CornFlowerBlue';
 const ParallelNodeColor: string = 'Cyan';
 const ConditionNodeColor: string = tinycolor('Cyan').lighten(40).toRgbString();
 const FetchNodeColor: string = 'LimeGreen';
+const FetchNodeSectionTitleColor: string = 'DarkMagenta';
 const VariablesColor: string = 'MediumSeaGreen'; 
 const RequireBackGroundColor: string = 'LightGreen';
 const FlattenNodeColor: string = tinycolor('LightGreen')
@@ -273,11 +275,18 @@ function processFetchNode(
     relation,
   );
   const curParentTreeNode = curParent.treeNode;
-  const kindRow = curParentTreeNode?.node.createItem(SimpleTextListItemType);
-  const kindStr = node.operationKind + ': ' + (node.operationName ?? '');
+  const kindRow = curParentTreeNode?.node.createItem(MultiLineTextListItemType);
+  const kindStr: string[] = ['${kind} ' + (node.operationName ?? '')];
+  const sectionDict: ClickableTextDict = {
+    'kind': {label: node.operationKind, color: FetchNodeSectionTitleColor}, 
+    'variables': {label: 'Variable Usages', color: FetchNodeSectionTitleColor},
+    'requires': {label: 'Requires', color: FetchNodeSectionTitleColor} 
+  };
   kindRow?.setContent({
-    label: kindStr,
+    content: kindStr,
     backgroundColor: FetchNodeColor,
+    initNumberOfRows: 1,
+    clickableTexts: sectionDict,
   });
   if (curParentTreeNode) {
     curParentTreeNode.rowsCount++;
@@ -291,7 +300,7 @@ function processFetchNode(
       MultiLineTextListItemType,
     );
     const varsLines: string[] = [];
-    varsLines.push('Variable Usages: ');
+    varsLines.push('${variables}');
     if (maxWidth < 17) {
       maxWidth = 17;
     }
@@ -305,6 +314,7 @@ function processFetchNode(
       content: varsLines,
       backgroundColor: VariablesColor,
       initNumberOfRows: 3,
+      clickableTexts: sectionDict,
     };
     varsRow?.setContent(varsContent);
     if (curParentTreeNode) {
@@ -315,7 +325,7 @@ function processFetchNode(
   const requires: QueryPlanSelectionNode[] | undefined = node.requires;
 
   if (requires && requires.length > 0 && curParent.treeNode) {
-    const selections = ['Requires: '];
+    const selections = ['${requires}'];
     selections.push('{');
     selections.push(...printQueryPlanSelections(singleIndent, requires));
     selections.push('}');
@@ -326,6 +336,7 @@ function processFetchNode(
       content: selections,
       backgroundColor: RequireBackGroundColor,
       initNumberOfRows: 3,
+      clickableTexts: sectionDict,
     };
     for (let i = 0; i < 3 && i < selections.length; i++) {
       if (maxWidth < selections[i].length) {
@@ -578,7 +589,7 @@ function processQueryPlan(diagramModel: DiagramModel, node: PlanNode, queryStr?:
     const row = nodeModel.createItem(MultiLineTextListItemType);
 
     const lines = queryStr.split(/\r?\n/);
-    const truncatedLines = lines.map(line => line.length > 80? (line.substring(0, 80)) + '...' : line);
+    const truncatedLines = lines; 
     const content: MultiLineText = {
       content: truncatedLines,
       backgroundColor: QueryPlanNodeColor,

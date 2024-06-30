@@ -2,14 +2,20 @@ import * as React from 'react';
 import {BaseEntity, DeserializeEvent} from '@projectstorm/react-diagrams';
 import {ListItemModel} from './ListItemModel';
 import { MultiLineTextWidget } from './MultiLineTextWidget';
+import { ClickableText } from './ClickableText';
 
 export const MultiLineTextListItemType: string = 'MultiLineTextListItem';
+
+export interface ClickableTextDict {
+  [index: string]: ClickableText,
+};
 
 export type MultiLineText = {
   content: string[];
   color?: string;
   backgroundColor?: string;
   initNumberOfRows?: number;
+  clickableTexts?: ClickableTextDict;
 };
 
 /**

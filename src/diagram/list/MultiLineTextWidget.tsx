@@ -3,18 +3,25 @@ import _map from 'lodash/map';
 import styled from '@emotion/styled';
 import tinycolor from 'tinycolor2';
 import CanvasContext from '../graphql/CanvasContext';
-import { MultiLineText } from './MultiLineTextListItem';
+import { ClickableTextDict, MultiLineText } from './MultiLineTextListItem';
 import { getTextColor } from '../utils/color';
+import { ClickableTextWidget } from './ClickableTextWidget';
 
 namespace Styled {
   export const Lines = styled.div`
     flex-direction: column;
     flex-grow: 1;
     display: flex;
+    width: 350px;
+    overflow: hidden;
+  `;
+
+  export const Line = styled.div`
+    flex-direction: row;
+    display: flex;
   `;
 
   export const Text = styled.div<{color?: string}>`
-    padding: 0 5px;
     flex-grow: 1;
     display: flex;
     margin-top: 1px;
@@ -23,7 +30,6 @@ namespace Styled {
   `;
 
   export const ClickableText = styled.div<{color: string; hoverColor: string}>`
-    padding: 0 5px;
     flex-grow: 1;
     display: flex;
     margin-top: 1px;
@@ -38,6 +44,35 @@ namespace Styled {
 
 export interface MultiLineTextProps {
   content: MultiLineText;
+}
+
+function LineComponent(props: {
+  color?: string, 
+  line: string, 
+  clickabeTexts?: ClickableTextDict}
+) {
+  const {color, line, clickabeTexts} = props;
+  const varRe = /\${[\w]+}/g;
+  let myArray;
+  const segs: JSX.Element[] = [];
+  let lastIndex = 0;
+  while ((myArray = varRe.exec(line)) !== null) {
+    const varName = myArray[0];
+    const curIndex = varRe.lastIndex;
+    if (curIndex - varName.length > lastIndex) {
+      const curText = line.substring(lastIndex, curIndex - varName.length);
+      segs.push(<Styled.Text key={curIndex} color={color}>{curText}</Styled.Text>);
+    }
+    const clickableText = clickabeTexts && clickabeTexts[varName.substring(2, varName.length - 1)];
+    if (clickableText) {
+      segs.push(<ClickableTextWidget key={curIndex + '_c'} content={clickableText}/>);
+    }
+    lastIndex = curIndex;
+  }
+  if (lastIndex < line.length) {
+    segs.push(<Styled.Text key={lastIndex} color={color}>{line.substring(lastIndex)}</Styled.Text>);
+  }
+  return <Styled.Line>{segs}</Styled.Line>;
 }
 
 export function MultiLineTextWidget(props: MultiLineTextProps) {
@@ -55,7 +90,7 @@ export function MultiLineTextWidget(props: MultiLineTextProps) {
   const hoverColor =
     tinyColor && tinyColor.isLight() ? 'RoyalBlue' : 'LightSkyBlue';
   const linesWidget = _map(lines, (line, index) => (
-    <Styled.Text key={index} color={colorToUse}>{line}</Styled.Text>
+    <LineComponent color={colorToUse} line={line} key={index} clickabeTexts={content.clickableTexts}/>
   ));
   return (
     <Styled.Lines>

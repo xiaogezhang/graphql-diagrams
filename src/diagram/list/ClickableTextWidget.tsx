@@ -8,7 +8,6 @@ import { getTextColor } from '../utils/color';
 
 namespace Styled {
   export const Text = styled.div<{color?: string}>`
-    padding: 0 5px;
     flex-grow: 1;
     display: flex;
     margin-top: 1px;
@@ -16,7 +15,6 @@ namespace Styled {
   `;
 
   export const ClickableText = styled.div<{color: string; hoverColor: string}>`
-    padding: 0 5px;
     flex-grow: 1;
     display: flex;
     margin-top: 1px;
