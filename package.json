@@ -1,12 +1,12 @@
 {
   "name": "graphql-diagrams",
- "version": "1.0.6",
+  "version": "1.0.7",
   "license": "MIT",
   "author": "Xiaoge Zhang <xiaoge.zhang@gmail.com>",
   "repository": "https://github.com/xiaogezhang/graphql-diagrams",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/esm/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "description": "Diagram components for GraphQL",
   "devDependencies": {
     "@babel/core": "^7.24.7",
@@ -17,12 +17,12 @@
     "prettier": "^2.8.8",
     "source-map-loader": "^5.0.0",
     "webpack": "^5.92.1",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "typescript": "^5.5.2"
   },
   "scripts": {
-    "build:esm": "tsc --sourcemap",
-    "build:cjs": "tsc --module commonjs --outDir dist/cjs --sourcemap",
-    "build": "rm -rf dist && yarn build:esm && yarn build:cjs"
+    "build": "tsc --sourcemap",
+    "clean": "rm -rf dist"
   },
   "keywords": [
     "web",
@@ -54,8 +54,7 @@
     "graphql": "^16.6.0",
     "pre-commit": "^1.2.2",
     "tinycolor2": "^1.6.0",
-    "ts-loader": "^9.5.1",
-    "typescript": "^5.5.2"
+    "ts-loader": "^9.5.1"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
