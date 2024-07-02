@@ -31,13 +31,13 @@ namespace Styled {
   export const Title = styled.div`
     background: rgba(0, 0, 0, 0.3);
     display: flex;
-    white-space: nowrap;
-    justify-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 5px 5px;
   `;
 
   export const TitleName = styled.div`
     flex-grow: 1;
-    padding: 5px 5px;
   `;
 
   export const HorizontalLine = styled.div`
@@ -99,6 +99,7 @@ export default function ListNodeWidget(props: ListNodeProps) {
       </React.Fragment>
     );
   };
+  const header = node.getHeader();
 
   return (
     <Styled.Node
@@ -112,7 +113,10 @@ export default function ListNodeWidget(props: ListNodeProps) {
       background={node.getOptions().color}>
       <Styled.Title key="title">
         <WithInOutPortsWidget model={node} engine={engine} key="title">
-          <Styled.TitleName key="titleName">{node.getOptions().name}</Styled.TitleName>
+          {header ? 
+              header.renderContent() :
+            <Styled.TitleName key="titleName">{node.getOptions().name}</Styled.TitleName>
+          }
         </WithInOutPortsWidget>
       </Styled.Title>
       <Styled.Items key="items">{_map(node.getItems(), createItem)}</Styled.Items>

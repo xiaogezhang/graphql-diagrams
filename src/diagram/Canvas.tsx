@@ -1,11 +1,9 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
-import createEngine, {
+import {
   CanvasWidget,
   DiagramEngine,
-  DiagramModel,
 } from '@projectstorm/react-diagrams';
-import {ListNodeFactory} from './node/ListNodeFactory';
 import GraphQLDiagramContext, {
   defaultTypeGraphOptions,
   TypeGraphOptions,
@@ -14,7 +12,6 @@ import CanvasContext from './graphql/CanvasContext';
 
 namespace Styled {
   export const Canvas = styled(CanvasWidget)<{
-    engine: DiagramEngine;
     rows?: number;
     columns?: number;
     nodeWidth?: number;
@@ -48,46 +45,41 @@ namespace Styled {
   `;
 }
 
-function createDefaultEngine(): DiagramEngine {
-  const engine = createEngine();
-  engine.getNodeFactories().registerFactory(new ListNodeFactory());
-  return engine;
-}
-
-const engine = createDefaultEngine();
-
 export default function Canvas(props: {
-  model: DiagramModel;
+  engine: DiagramEngine;
   rows?: number;
   columns?: number;
   nodeWidth?: number;
   nodeHeight?: number;
   showOptions?: boolean;
 }) {
-  const {model, rows, columns, nodeWidth, nodeHeight, showOptions} = props;
-  engine.setModel(model);
+  const {engine, rows, columns, nodeWidth, nodeHeight, showOptions} = props;
   const [options, setOptions] = React.useState<TypeGraphOptions>(
     defaultTypeGraphOptions,
   );
   const scrollCanvas = React.useCallback(
     (x: number, y: number) => {
       // below doesn't work, as the canvas model maintains offsetX and offsetY
-      // htmlElem.scrollIntoView(..) or other scroll method don't update 
+      // htmlElem.scrollIntoView(..) or other scroll method don't update
       // canvas offsets, and will cause wrong position for all nodes and links.
       //const canvasElem = engine.getCanvas();
       //canvasElem?.scrollBy(x, y);
+      const model = engine.getModel();
+      if (!model) {
+        return;
+      }
       const width = window.innerWidth;
       const height = window.innerHeight;
       const oldOffsetX = model.getOffsetX();
       const oldOffsetY = model.getOffsetY();
       // Below test both x and y dimensions.
-      // x is the coordinate it's going to scroll to. offsetX is the x dimension 
+      // x is the coordinate it's going to scroll to. offsetX is the x dimension
       // offset for the canvas, so if (x + oldOffsetX) < 0, it means if we scroll
-      // to x, the x coordinate of the target node will be negative, which means it's 
+      // to x, the x coordinate of the target node will be negative, which means it's
       // outside of the viewable area to the left; on the other side, if
       // (x + oldOffsetX) > (2 * width) / 3, it means the x coordinate of the node
       // is less than 1/3 width of the viewable area to the right side, so we don't want
-      // to scroll that far. 
+      // to scroll that far.
       // On Y dimension, it's same idea as on X dimension.
       if (
         x + oldOffsetX < 0 ||
@@ -102,12 +94,12 @@ export default function Canvas(props: {
         engine.repaintCanvas();
       }
     },
-    [model],
+    [engine],
   );
   return (
     <>
       <CanvasContext.Provider
-        value={{scrollCanvas: scrollCanvas, canvasModel: model}}>
+        value={{scrollCanvas: scrollCanvas, canvasModel: engine.getModel()}}>
         <Styled.Canvas
           engine={engine}
           columns={columns}

@@ -51,6 +51,7 @@ const QueryPlanNodeColor = 'CornFlowerBlue';
 const ParallelNodeColor: string = 'Cyan';
 const ConditionNodeColor: string = tinycolor('Cyan').lighten(40).toRgbString();
 const FetchNodeColor: string = 'LimeGreen';
+const FetchNodeHeaderColor: string = 'Yellow';
 const FetchNodeSectionTitleColor: string = 'DarkMagenta';
 const VariablesColor: string = 'MediumSeaGreen'; 
 const RequireBackGroundColor: string = 'LightGreen';
@@ -278,10 +279,24 @@ function processFetchNode(
   const kindRow = curParentTreeNode?.node.createItem(MultiLineTextListItemType);
   const kindStr: string[] = ['${kind} ' + (node.operationName ?? '')];
   const sectionDict: ClickableTextDict = {
-    'kind': {label: node.operationKind, color: FetchNodeSectionTitleColor}, 
-    'variables': {label: 'Variable Usages', color: FetchNodeSectionTitleColor},
-    'requires': {label: 'Requires', color: FetchNodeSectionTitleColor} 
+    kind: {label: node.operationKind, color: FetchNodeSectionTitleColor},
+    variables: {label: 'Variable Usages', color: FetchNodeSectionTitleColor},
+    requires: {label: 'Requires', color: FetchNodeSectionTitleColor},
   };
+  if (node.serviceName) {
+    const header = curParentTreeNode?.node.createHeader(
+      MultiLineTextListItemType,
+    );
+    const headerLabel: string[] = ['Fetch (${' + node.serviceName + '})'];
+    sectionDict[node.serviceName] = {label: node.serviceName, color: FetchNodeHeaderColor};
+    if (header) {
+      header.setContent({
+        content: headerLabel,
+        initNumberOfRows: 1,
+        clickableTexts: sectionDict,
+      });
+    }
+  }
   kindRow?.setContent({
     content: kindStr,
     backgroundColor: FetchNodeColor,
@@ -604,24 +619,15 @@ function processQueryPlan(diagramModel: DiagramModel, node: PlanNode, queryStr?:
     treeNode.rowsCount += 15;
     treeNode.width = maxWidth;
   }
-  const charWidth: number = 7;
   const rowHeight: number = 20;
-  const xGap: number = 20;
   const yGap: number = 40;
-  const nodeWidth: number = 30;
 
   const fetchNodes = new Map<string, ListNodeModel>();
   processNode(diagramModel, parent, node, fetchNodes);
   nodeModel.setPosition(10, 10);
   const startX = 40; //(maxWidth * charWidth + xGap) / 3;
   const startY = treeNode.rowsCount * rowHeight + (treeNode.rowsCount >= 5 ? yGap : yGap * 3)
-  layout(treeNode.children, startX, startY, {
-    charWidth: charWidth,
-    rowHeight: rowHeight,
-    yGap: yGap,
-    xGap: xGap,
-    nodeWidth: nodeWidth,
-  });
+  layout(treeNode.children, startX, startY);
 }
 
 function process(diagramModel: DiagramModel, plan: QueryPlan, queryStr?: string) {

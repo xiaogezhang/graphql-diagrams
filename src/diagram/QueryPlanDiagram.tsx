@@ -1,26 +1,13 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import styled from '@emotion/styled';
-import {
-  CanvasWidget,
-  DiagramEngine,
-  DiagramModel,
-} from '@projectstorm/react-diagrams';
+import {DiagramEngine} from '@projectstorm/react-diagrams';
 import Canvas from './Canvas';
 import {createQueryPlanGraph} from './graphql/queryPlan/QueryPlanGraph';
 import OutsideClickObserver from './core/hooks';
+import createDefaultEngine from './core/createDefaultEngine';
 
 namespace Styled {
-  export const Canvas = styled(CanvasWidget)<{
-    engine: DiagramEngine;
-    rows?: number;
-    columns?: number;
-    nodeWidth?: number;
-    nodeHeight?: number;
-  }>`
-    id: digram-canvas;
-  `;
-
   export const Container = styled.div<{expanded?: boolean}>`
     position: ${(p) => (p.expanded ? 'fixed' : 'static')};
     top: 0;
@@ -71,62 +58,72 @@ export default function QueryPlanDiagram(props: {
   queryStr?: string,
 }) {
   const {queryPlan, queryStr} = props;
-  const [expanded, setExpanded] = useState<boolean>(true);
   const [currentModel, setCurrentModel] = useState<{
-    model?: DiagramModel;
+    engine?: DiagramEngine;
+    expanded?: boolean;
     nodeCount?: number;
-  }>({});
-  const [error, setError] = useState<Error | null>(null);
-  const generateModel = useCallback((plan) => {
+    error?: Error,
+  }>({expanded: true});
+  useEffect(() => {
     try {
-      const model = createQueryPlanGraph(plan, queryStr);
-      const nodes = model.getNodes();
-      const nodeCount = nodes.length / 4; 
-      setCurrentModel((prevModel) => ({
-        model: model,
-        nodeCount: nodeCount < 50 ? 50 : nodeCount,
+      const engine = createDefaultEngine();
+      const model = queryPlan ? createQueryPlanGraph(queryPlan, queryStr) : null;
+      if (model) {
+        engine.setModel(model);
+      }
+      const nodes = model?.getNodes();
+      const nodeCount = (nodes?.length ?? 0) / 4 < 50 ? 50 : (nodes?.length ?? 0) / 4; 
+      setCurrentModel(prev => ({
+        engine: engine,
+        nodeCount: nodeCount,
+        expanded: prev.expanded,
       }));
     } catch (e) {
-      if (e instanceof Error) {
-        setError(e);
-      }
+      setCurrentModel(prev => ({
+        expanded: prev.expanded,
+        error: e instanceof Error? e : undefined,
+      }));
     }
-  }, [queryStr]);
-  useEffect(() => {
-    generateModel(queryPlan);
-  }, [generateModel, queryPlan]);
-  const errorComponent = error? <div color="red">{error.message}</div> : null;
-  const loadingComponent = <div color="green">loading</div>;
+  }, [queryPlan, queryStr]);
 
-  return currentModel.model ? (
+  return currentModel.engine ? (
     <OutsideClickObserver
-      onClickOutside={(outside) => outside && setExpanded(false)}>
-      <Styled.Container expanded={expanded}>
-        <Styled.Header>
-          {expanded ? (
-            <Styled.Button onClick={() => setExpanded(!expanded)}>&#9196;</Styled.Button>
-          ) : (
-            <Styled.Button onClick={() => setExpanded(!expanded)}>&#9195;</Styled.Button>
-          )}
-          <Styled.Link>
-            <a
-              href="https://www.apollographql.com/docs/federation/query-plans/"
-              rel="noopener"
-              target="_blank">
-              Doc: Apollo Query Plan
-            </a>
-          </Styled.Link>
-        </Styled.Header>
-        <Canvas
-          model={currentModel.model}
-          columns={currentModel.nodeCount}
-          nodeWidth={150}
-          rows={currentModel.nodeCount}
-          nodeHeight={150}
-        />
-      </Styled.Container>
-    </OutsideClickObserver>
-  ) : (
-    error? errorComponent : loadingComponent
-  );
+      onClickOutside={(outside) => outside && setCurrentModel({
+        engine: currentModel.engine, 
+        nodeCount: currentModel.nodeCount, 
+        expanded: false})}>
+      <Styled.Container expanded={currentModel.expanded}>
+          <Styled.Header>
+            {currentModel.expanded ? (
+              <Styled.Button onClick={() => setCurrentModel({
+                engine: currentModel.engine, 
+                nodeCount: currentModel.nodeCount,
+                expanded: !currentModel.expanded})}>&#9196;</Styled.Button>
+             ) : (
+              <Styled.Button onClick={() => setCurrentModel({
+                engine: currentModel.engine, 
+                nodeCount: currentModel.nodeCount,
+                expanded: !currentModel.expanded})}>&#9195;</Styled.Button>
+            )}
+            <Styled.Link>
+              <a
+                href="https://www.apollographql.com/docs/federation/query-plans/"
+                rel="noopener"
+                target="_blank">
+                Doc: Apollo Query Plan
+              </a>
+            </Styled.Link>
+          </Styled.Header>
+          <Canvas
+            engine={currentModel.engine}
+            columns={currentModel.nodeCount}
+            nodeWidth={150}
+            rows={currentModel.nodeCount}
+            nodeHeight={150}
+          />
+        </Styled.Container>
+      </OutsideClickObserver>
+    ) : ( 
+      currentModel.error? <div color="red">{currentModel.error.message}</div>: <div color="green">loading</div> 
+    );
 }

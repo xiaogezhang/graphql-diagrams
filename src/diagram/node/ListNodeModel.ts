@@ -30,6 +30,7 @@ export class ListNodeModel extends DefaultNodeModel implements WithInOutPorts {
   protected inPort?: PortModel;
   protected outPort?: PortModel;
   protected items: ListItemModel<any>[];
+  protected header?: ListItemModel<any>;
 
   constructor(name: string, color: string);
   constructor(options?: ListNodeModelOptions);
@@ -85,6 +86,17 @@ export class ListNodeModel extends DefaultNodeModel implements WithInOutPorts {
     if (found === null) {
       this.items.push(item);
     }
+  }
+
+  createHeader(type: string): ListItemModel<any> {
+    const item = createListItem(type);
+    item.setParent(this);
+    this.header = item;
+    return item;
+  }
+
+  getHeader(): ListItemModel<any> | undefined {
+    return this.header;
   }
 
   createItem(type: string): ListItemModel<any> {
@@ -150,6 +162,7 @@ export class ListNodeModel extends DefaultNodeModel implements WithInOutPorts {
     super.doClone(lookupTable, clone);
     clone.inPortEnabled = this.inPortEnabled;
     clone.outPortEnabled = this.outPortEnabled;
+    clone.header = this.header?.clone(lookupTable); 
     clone.items = [];
 
     _forEach(this.items, (item) => {
@@ -166,6 +179,17 @@ export class ListNodeModel extends DefaultNodeModel implements WithInOutPorts {
     }
     if (event.data.outPort) {
       this.outPort = this.getPortFromID(event.data.outPortID) || undefined;
+    }
+    const headerData = event.data.header;
+    if (headerData) {
+      this.header = createListItem(headerData.type);
+      const headerEvent: DeserializeEvent<ListItemModel<any>> = {
+         engine: event.engine,
+         registerModel: event.registerModel,
+         getModel: event.getModel,
+         data: headerData,
+      };
+      this.header.deserialize(headerEvent);
     }
     
     _forEach(event.data.items, (item: any) => {
@@ -188,6 +212,7 @@ export class ListNodeModel extends DefaultNodeModel implements WithInOutPorts {
       outPortEnabled: this.outPortEnabled,
       inPortID: this.inPort?.getID(),
       outPortID: this.outPort?.getID(),
+      header: this.header?.serialize(),
       items: _map(this.items, (item) => {
         return item.serialize();
       }),

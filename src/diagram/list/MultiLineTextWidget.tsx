@@ -3,9 +3,9 @@ import _map from 'lodash/map';
 import styled from '@emotion/styled';
 import tinycolor from 'tinycolor2';
 import CanvasContext from '../graphql/CanvasContext';
-import { ClickableTextDict, MultiLineText } from './MultiLineTextListItem';
-import { getTextColor } from '../utils/color';
-import { ClickableTextWidget } from './ClickableTextWidget';
+import {ClickableTextDict, MultiLineText} from './MultiLineTextListItem';
+import {getTextColor} from '../utils/color';
+import {ClickableTextWidget} from './ClickableTextWidget';
 
 namespace Styled {
   export const Lines = styled.div`
@@ -18,6 +18,7 @@ namespace Styled {
 
   export const Line = styled.div`
     flex-direction: row;
+    width: fit-content;
     display: flex;
   `;
 
@@ -47,10 +48,10 @@ export interface MultiLineTextProps {
 }
 
 function LineComponent(props: {
-  color?: string, 
-  line: string, 
-  clickabeTexts?: ClickableTextDict}
-) {
+  color?: string;
+  line: string;
+  clickabeTexts?: ClickableTextDict;
+}) {
   const {color, line, clickabeTexts} = props;
   const varRe = /\${[\w]+}/g;
   let myArray;
@@ -80,7 +81,7 @@ export function MultiLineTextWidget(props: MultiLineTextProps) {
   const rowLimit = content.initNumberOfRows ?? 20;
   const [expanded, setExpanded] = React.useState<boolean>(false);
   const needExpandLink = rowLimit < content.content.length;
-  const lines = expanded ? content.content: content.content.slice(0, rowLimit);
+  const lines = expanded ? content.content : content.content.slice(0, rowLimit);
   const color = content.color;
   const backgroundColor = content.backgroundColor;
   const colorToUse = getTextColor(false, color, backgroundColor);
@@ -90,18 +91,24 @@ export function MultiLineTextWidget(props: MultiLineTextProps) {
   const hoverColor =
     tinyColor && tinyColor.isLight() ? 'RoyalBlue' : 'LightSkyBlue';
   const linesWidget = _map(lines, (line, index) => (
-    <LineComponent color={colorToUse} line={line} key={index} clickabeTexts={content.clickableTexts}/>
+    <LineComponent
+      color={colorToUse}
+      line={line}
+      key={index}
+      clickabeTexts={content.clickableTexts}
+    />
   ));
   return (
     <Styled.Lines>
       {linesWidget}
-      {needExpandLink && <Styled.ClickableText
-        color={colorToUseForLink}
-        hoverColor={hoverColor}
-        onClick={() => setExpanded(!expanded)}>
-          {expanded? 'Collapse' : 'Expand'}
+      {needExpandLink && (
+        <Styled.ClickableText
+          color={colorToUseForLink}
+          hoverColor={hoverColor}
+          onClick={() => setExpanded(!expanded)}>
+          {expanded ? 'Collapse' : 'Expand'}
         </Styled.ClickableText>
-      }
+      )}
     </Styled.Lines>
   );
 }

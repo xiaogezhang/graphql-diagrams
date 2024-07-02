@@ -12,7 +12,8 @@ export type LayoutConfig = {
   rowHeight: number;
   yGap: number;
   xGap: number;
-  nodeWidth: number;
+  minNodeWidth: number;
+  maxNodeWidth: number;
 };
 
 export const defaultLayoutConfig: LayoutConfig = {
@@ -20,7 +21,8 @@ export const defaultLayoutConfig: LayoutConfig = {
   rowHeight: 30,
   yGap: 20,
   xGap: 20,
-  nodeWidth: 30,
+  minNodeWidth: 30,
+  maxNodeWidth: 350,
 };
 
 /**
@@ -39,14 +41,14 @@ export function layout(
   startY: number,
   layoutConfig?: LayoutConfig,
 ): void {
-  const {charWidth, rowHeight, yGap, xGap, nodeWidth} = layoutConfig ?? defaultLayoutConfig;
+  const {charWidth, rowHeight, yGap, xGap, minNodeWidth, maxNodeWidth} = layoutConfig ?? defaultLayoutConfig;
   let level: Array<TreeNode> = roots;
   const visited: Set<string> = new Set();
   let curX = startX;
   while (level.length > 0) {
     let curY = startY;
     const nextLevel: Array<TreeNode> = [];
-    let maxWidth = nodeWidth;
+    let maxWidth = minNodeWidth;
     level.forEach((node) => {
       if (!visited.has(node.node.getID())) {
         node.node.setPosition(curX, curY);
@@ -62,6 +64,7 @@ export function layout(
       }
     });
     level = nextLevel;
-    curX += maxWidth * charWidth + xGap;
+    const xIncr = maxWidth * charWidth > maxNodeWidth ? maxNodeWidth : maxWidth * charWidth;
+    curX += xIncr + xGap;
   }
 }
