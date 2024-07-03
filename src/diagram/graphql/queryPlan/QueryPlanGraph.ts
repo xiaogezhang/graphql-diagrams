@@ -58,6 +58,7 @@ const RequireBackGroundColor: string = 'LightGreen';
 const FlattenNodeColor: string = tinycolor('LightGreen')
   .lighten(15)
   .toRgbString();
+const FlattenNodePathColor: string = 'Indigo';
 const DeferNodeColor: string = tinycolor('Brown').lighten(50).toRgbString();
 const SubscriptionNodeColor: string = 'SlateGrey';
 
@@ -561,6 +562,24 @@ function processFlattenNode(
     FlattenNodeColor,
     relation,
   );
+  const curParentTreeNode = curParent.treeNode;
+  const header = curParentTreeNode?.node.createHeader(
+    MultiLineTextListItemType,
+  );
+  const headerLabel: string[] = ['Flatten (${path})'];
+  const sectionDict: ClickableTextDict = {
+    path: {
+      label: node.path.join('.').replaceAll('@', '[]'),
+      color: FlattenNodePathColor,
+    },
+  };
+  if (header) {
+    header.setContent({
+      content: headerLabel,
+      initNumberOfRows: 1,
+      clickableTexts: sectionDict,
+    });
+  }
   return processNode(diagramModel, curParent, node.node, fetchNodes);
 }
 
