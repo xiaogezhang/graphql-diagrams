@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
 
 import styled from '@emotion/styled';
-import {DiagramEngine} from '@projectstorm/react-diagrams';
 import Canvas from './Canvas';
 import {createQueryPlanGraph} from './graphql/queryPlan/QueryPlanGraph';
 import OutsideClickObserver from './core/hooks';
-import createDefaultEngine from './core/createDefaultEngine';
+import { DefaultDiagramEngine } from './DefaultDiagramEngine';
 
 namespace Styled {
   export const Container = styled.div<{expanded?: boolean}>`
@@ -59,14 +58,14 @@ export default function QueryPlanDiagram(props: {
 }) {
   const {queryPlan, queryStr} = props;
   const [currentModel, setCurrentModel] = useState<{
-    engine?: DiagramEngine;
+    engine?: DefaultDiagramEngine;
     expanded?: boolean;
     nodeCount?: number;
     error?: Error,
   }>({expanded: true});
   useEffect(() => {
     try {
-      const engine = createDefaultEngine();
+      const engine = new DefaultDiagramEngine();
       const model = queryPlan ? createQueryPlanGraph(queryPlan, queryStr) : null;
       if (model) {
         engine.setModel(model);

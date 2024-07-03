@@ -1,7 +1,6 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
 import {
-  CanvasWidget,
   DiagramEngine,
 } from '@projectstorm/react-diagrams';
 import GraphQLDiagramContext, {
@@ -9,6 +8,7 @@ import GraphQLDiagramContext, {
   TypeGraphOptions,
 } from './graphql/GraphQLDiagramContext';
 import CanvasContext from './graphql/CanvasContext';
+import { CanvasWidget } from './CanvasWidget';
 
 namespace Styled {
   export const Canvas = styled(CanvasWidget)<{

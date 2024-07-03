@@ -3,21 +3,20 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {createTypeGraph} from './graphql/GraphQLTypeGraph';
 import {sdlToSchema} from './graphql/sdlToSchema';
 import Canvas from './Canvas';
-import createDefaultEngine from './core/createDefaultEngine';
-import { DiagramEngine } from '@projectstorm/react-diagrams';
+import { DefaultDiagramEngine } from './DefaultDiagramEngine';
 
 export default function SchemaDiagram(props: {sdl?: string}) {
   const {sdl} = props;
   const [currentModel, setCurrentModel] = useState<{
-    engine?: DiagramEngine;
+    engine?: DefaultDiagramEngine;
     nodeCount?: number; 
   }>({});
   useEffect(() => {
     if (sdl) {
-      const engine = createDefaultEngine();
+      const engine = new DefaultDiagramEngine();
       const {schema, errors} = sdlToSchema(sdl);
       const model = createTypeGraph(errors, schema);
-      const nodeCount = (Object.values(schema?.getTypeMap() ?? {}).length ?? 10) + (errors ? errors.length : 0);
+      const nodeCount = (Object.values(schema?.getTypeMap() ?? {}).length ?? 10) + (errors ? (errors.length + 4)  : 10);
       if (model) {
         engine.setModel(model);
       }

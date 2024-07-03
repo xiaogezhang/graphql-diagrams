@@ -1,6 +1,6 @@
 {
   "name": "graphql-diagrams",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "license": "MIT",
   "author": "Xiaoge Zhang <xiaoge.zhang@gmail.com>",
   "repository": "https://github.com/xiaogezhang/graphql-diagrams",
@@ -27,7 +27,7 @@
     "webpack-cli": "^5.1.4"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsc && tsup",
     "clean": "rm -rf dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
