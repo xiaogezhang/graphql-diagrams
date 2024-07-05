@@ -8,7 +8,7 @@ export const SimpleTextListItemType: string = 'SimpleTextListItem';
 
 export class SimpleTextListItem extends ListItemModel<ClickableText> {
 
-  constructor(content?: ClickableText, backgroundColor? :string) {
+  constructor(content?: ClickableText) {
     super(SimpleTextListItemType);
     this.content = content;
   }
@@ -18,13 +18,13 @@ export class SimpleTextListItem extends ListItemModel<ClickableText> {
   }
 
   deserializeContent(
-    event: DeserializeEvent<BaseEntity>,
+    _: DeserializeEvent<BaseEntity>,
     data: any,
   ): ClickableText {
     return data as ClickableText;
   }
 
-  renderContent(): JSX.Element {
+  renderContent(): React.JSX.Element {
     const onClick = () => this.unselectNode();
     return this.content ? (
       <ClickableTextWidget content={this.content} onClick={onClick} />

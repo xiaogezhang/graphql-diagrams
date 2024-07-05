@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {createTypeGraph} from './graphql/GraphQLTypeGraph';
 import {sdlToSchema} from './graphql/sdlToSchema';
@@ -20,7 +20,7 @@ export default function SchemaDiagram(props: {sdl?: string}) {
       if (model) {
         engine.setModel(model);
       }
-      setCurrentModel(prev => ({
+      setCurrentModel(_ => ({
         engine: engine,
         nodeCount: nodeCount,
       }));

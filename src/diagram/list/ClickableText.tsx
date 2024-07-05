@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 /**
  * Currently only support these kinds of target. NODE is the id of a node model in the canvas. 
  * Each model in the diagram has one unique ID.

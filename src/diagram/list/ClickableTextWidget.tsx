@@ -54,7 +54,7 @@ export function ClickableTextWidget(props: ClickableTextProps) {
     return <Styled.Text color={colorToUse}>{label}</Styled.Text>;
   }
   const onClickEvent = target
-    ? (e) => {
+    ? (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         if (onClick) {

@@ -2,7 +2,6 @@ import * as React from 'react';
 import _map from 'lodash/map';
 import styled from '@emotion/styled';
 import tinycolor from 'tinycolor2';
-import CanvasContext from '../graphql/CanvasContext';
 import {ClickableTextDict, MultiLineText} from './MultiLineTextListItem';
 import {getTextColor} from '../utils/color';
 import {ClickableTextWidget} from './ClickableTextWidget';
@@ -55,7 +54,7 @@ function LineComponent(props: {
   const {color, line, clickabeTexts} = props;
   const varRe = /\${[\w]+}/g;
   let myArray;
-  const segs: JSX.Element[] = [];
+  const segs: React.JSX.Element[] = [];
   let lastIndex = 0;
   while ((myArray = varRe.exec(line)) !== null) {
     const varName = myArray[0];
@@ -86,7 +85,6 @@ export function MultiLineTextWidget(props: MultiLineTextProps) {
   const backgroundColor = content.backgroundColor;
   const colorToUse = getTextColor(false, color, backgroundColor);
   const colorToUseForLink = getTextColor(true, color, backgroundColor);
-  const canvas = React.useContext(CanvasContext);
   const tinyColor = backgroundColor ? tinycolor(backgroundColor) : null;
   const hoverColor =
     tinyColor && tinyColor.isLight() ? 'RoyalBlue' : 'LightSkyBlue';

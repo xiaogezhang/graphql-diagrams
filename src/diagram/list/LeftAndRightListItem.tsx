@@ -58,13 +58,13 @@ export class LeftAndRightListItem extends ListItemModel<LeftAndRight> {
   }
 
   deserializeContent(
-    event: DeserializeEvent<BaseEntity>,
+    _: DeserializeEvent<BaseEntity>,
     data: any,
   ): LeftAndRight {
     return data as LeftAndRight;
   }
 
-  renderContent(): JSX.Element {
+  renderContent(): React.JSX.Element {
     const left = this.content?.left;
     const right = this.content?.right;
     const onClick = () => this.unselectNode();

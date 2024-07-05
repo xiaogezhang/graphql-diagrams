@@ -121,28 +121,33 @@ function hydrateUnionType(
     } else {
       memberNode = nodesMap.get(memberName);
     }
-    const memberInPort = memberNode.getInPort();
-    const memberLink = memberRowPort.link<DefaultLinkModel>(memberInPort);
-    memberLink.setWidth(2);
-    memberLink.setColor(unionTypeLinkColor);
-    memberLink.setLocked(true);
-    diagramModel.addLink(memberLink);
-    memberRow.setContent({
-      label: memberName,
-      backgroundColor: typeNode.getOptions().color,
-      target: {
-        type: TargetType.NODE,
-        value: memberNode.getID(),
-      },
-    });
+    if (memberNode) {
+      const memberInPort = memberNode.getInPort();
+      if (memberInPort) {
+        const memberLink = memberRowPort.link<DefaultLinkModel>(memberInPort);
+        memberLink.setWidth(2);
+        memberLink.setColor(unionTypeLinkColor);
+        memberLink.setLocked(true);
+        diagramModel.addLink(memberLink);
+      }
+    
+      memberRow.setContent({
+        label: memberName,
+        backgroundColor: typeNode.getOptions().color,
+        target: {
+          type: TargetType.NODE,
+          value: memberNode.getID(),
+        },
+      });
+    }
   });
 }
 
 function hydrateEnumType(
-  diagramModel: DiagramModel,
+  _diagramModel: DiagramModel,
   type: GraphQLEnumType,
   typeTreeNode: TreeNode,
-  nodesMap: Map<string, ListNodeModel>,
+  _nodesMap: Map<string, ListNodeModel>,
 ): void {
   const values = type.getValues();
   const typeNode = typeTreeNode.node;
@@ -229,26 +234,30 @@ function hydrateTypeNode(
       } else {
         fieldTypeNode = nodesMap.get(fieldTypeDisplay.baseType.name);
       }
-      if (isMutation) {
-        fieldTypeNode.getOptions().color = MutationColor;
-      } else if (isQuery) {
-        fieldTypeNode.getOptions().color = QueryColor;
+      if (fieldTypeNode) {
+        if (isMutation) {
+          fieldTypeNode.getOptions().color = MutationColor;
+        } else if (isQuery) {
+          fieldTypeNode.getOptions().color = QueryColor;
+        }
+        if (rowContent.right) {
+          rowContent.right.target = {
+            type: TargetType.NODE,
+            value: fieldTypeNode.getID(),
+          };
+        }
+        const rowOutPort = typeNode.addOutPort(fieldName);
+        fieldRow.setOutPort(rowOutPort);
+        rowOutPort.setLocked(true);
+        const fieldTypeInPort = fieldTypeNode.getInPort();
+        if (fieldTypeInPort) {
+          const fieldLink = rowOutPort.link<DefaultLinkModel>(fieldTypeInPort);
+          fieldLink.setWidth(2);
+          fieldLink.setColor(fieldTypeLinkColor);
+          fieldLink.setLocked(true);
+          diagramModel.addLink(fieldLink);
+        }
       }
-      if (rowContent.right) {
-        rowContent.right.target = {
-          type: TargetType.NODE,
-          value: fieldTypeNode.getID(),
-        };
-      }
-      const rowOutPort = typeNode.addOutPort(fieldName);
-      fieldRow.setOutPort(rowOutPort);
-      rowOutPort.setLocked(true);
-      const fieldTypeInPort = fieldTypeNode.getInPort();
-      const fieldLink = rowOutPort.link<DefaultLinkModel>(fieldTypeInPort);
-      fieldLink.setWidth(2);
-      fieldLink.setColor(fieldTypeLinkColor);
-      fieldLink.setLocked(true);
-      diagramModel.addLink(fieldLink);
     }
     const fieldLen = fieldName.length + displayName.length + 4;
     if (fieldLen > typeTreeNode.width) {
@@ -319,7 +328,7 @@ export function createTypeGraph(
     });
     diagramModel.addNode(errorsNode);
     let width = 6;
-    errors.forEach((error, idx) => {
+    errors.forEach((error) => {
       const errorStr = error.toString();
       const lines = errorStr.split(/\r?\n/);
       const content: MultiLineText = {
@@ -354,7 +363,7 @@ export function createTypeGraph(
 
   const createMetaLinks = options?.createMetaLinks ?? false;
   const createInheritanceLinks = options?.createInheritanceLinks ?? false;
-  const createInputObjectTypes = options?.createInputObjectTypes ?? false;
+  // const createInputObjectTypes = options?.createInputObjectTypes ?? false;
 
   const nodesMap = new Map<string, ListNodeModel>();
 
@@ -384,7 +393,7 @@ export function createTypeGraph(
     children: [],
   };
   roots.push(schemaTreeNode);
-  schemaRows.forEach((schemaRow, index) => {
+  schemaRows.forEach((schemaRow) => {
     const {name, color} = schemaRow;
     const nodeForRow = new ListNodeModel({
       name: name,
@@ -632,20 +641,22 @@ function createTypeRowAndNode(
   } else {
     typeNode = nodesMap.get(type.name);
   }
-  const typeInPort = typeNode.getInPort();
-  if (createMetaLinks) {
-    const typeLink = typeRowPort.link<DefaultLinkModel>(typeInPort);
-    typeLink.setWidth(2);
-    typeLink.setColor(metaTypeLinkColor);
-    typeLink.setLocked(true);
-    diagramModel.addLink(typeLink);
+  if (typeNode) {
+    const typeInPort = typeNode.getInPort();
+    if (createMetaLinks && typeInPort) {
+      const typeLink = typeRowPort.link<DefaultLinkModel>(typeInPort);
+      typeLink.setWidth(2);
+      typeLink.setColor(metaTypeLinkColor);
+      typeLink.setLocked(true);
+      diagramModel.addLink(typeLink);
+    }
+    typeRow.setContent({
+      label: type.name,
+      backgroundColor: typesNode.getOptions().color,
+      target: {
+        type: TargetType.NODE,
+        value: typeNode.getID(),
+      },
+    });
   }
-  typeRow.setContent({
-    label: type.name,
-    backgroundColor: typesNode.getOptions().color,
-    target: {
-      type: TargetType.NODE,
-      value: typeNode.getID(),
-    },
-  });
 }

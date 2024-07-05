@@ -24,10 +24,12 @@ export function CanvasWidget(props: DiagramProps) {
   const [, forceUpdate] = React.useReducer(x => x + 1, 0);
   const {engine, className} = props;
   const model = engine.getModel();
+  // @ts-ignore
   const keyDown = React.useCallback((event) => {
     //engine.setCanvas(ref.current);
     engine.getActionEventBus().fireAction({event});
   }, [engine]);
+  // @ts-ignore
   const keyUp = React.useCallback((event) => {
     //engine.setCanvas(ref.current);
     engine.getActionEventBus().fireAction({event});

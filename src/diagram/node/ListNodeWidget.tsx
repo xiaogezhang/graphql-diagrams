@@ -1,6 +1,6 @@
 import * as React from 'react';
 import _map from 'lodash/map';
-import {DiagramEngine, PortWidget} from '@projectstorm/react-diagrams-core';
+import {DiagramEngine} from '@projectstorm/react-diagrams-core';
 import styled from '@emotion/styled';
 import {ListNodeModel} from './ListNodeModel';
 import {ListItemModel} from '../list/ListItemModel';
@@ -33,7 +33,8 @@ namespace Styled {
     display: flex;
     justify-content: flex-start;
     width: 100%;
-    padding: 5px 5px;
+    padding: 5px 0px;
+    overflow: hidden;
   `;
 
   export const TitleName = styled.div`
@@ -87,7 +88,7 @@ export interface ListNodeProps {
 export default function ListNodeWidget(props: ListNodeProps) {
   const {node, engine} = props;
   const [grabbing, setGrabbing] = React.useState<boolean>(false);
-  const createItem = (item: ListItemModel<any>, index) => {
+  const createItem = (item: ListItemModel<any>, index: number) => {
     return (
       <React.Fragment key={index}>
         <Styled.Item key={index} background={item.getBackgroundColor()}>

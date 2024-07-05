@@ -13,7 +13,7 @@ export abstract class ItemFactory<T> extends AbstractModelFactory<
   ListItemModel<T, ListItemModelGenerics>,
   DiagramEngine
 > {
-  generateModel(event: GenerateModelEvent): ListItemModel<T> {
+  generateModel(_: GenerateModelEvent): ListItemModel<T> {
     return createListItem(this.getType());
   }
 }

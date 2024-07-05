@@ -27,7 +27,7 @@ export class DragCanvasState<
     this.initialCanvasY = 0;
   }
 
-  async activated(prev) {
+  async activated(prev: State) {
     super.activated(prev);
     this.engine.getModel().clearSelection();
 

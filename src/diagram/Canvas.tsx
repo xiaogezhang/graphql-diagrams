@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import {
   DiagramEngine,
 } from '@projectstorm/react-diagrams';
-import GraphQLDiagramContext, {
+import {
   defaultTypeGraphOptions,
   TypeGraphOptions,
 } from './graphql/GraphQLDiagramContext';

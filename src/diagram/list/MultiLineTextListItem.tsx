@@ -32,13 +32,13 @@ export class MultiLineTextListItem extends ListItemModel<MultiLineText> {
   }
 
   deserializeContent(
-    event: DeserializeEvent<BaseEntity>,
+    _: DeserializeEvent<BaseEntity>,
     data: any,
   ): MultiLineText {
     return data as MultiLineText;
   }
 
-  renderContent(): JSX.Element {
+  renderContent(): React.JSX.Element {
     return this.content ? (
       <MultiLineTextWidget key={this.getID()} content={this.content} />
     ) : (
