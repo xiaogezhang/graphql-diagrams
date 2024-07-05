@@ -32,7 +32,7 @@ function ExpandableDiagram(props: React.PropsWithChildren<{
   header?: React.JSX.Element;
 }>) {
   return <ExpandableContainer 
-    backgroundColor="rgb(225, 225, 225)"
+    backgroundColor="rgb(240, 240, 240)"
     collapseOnClickOutside={true}
     header={props.header}
     startAsExpanded={false} 

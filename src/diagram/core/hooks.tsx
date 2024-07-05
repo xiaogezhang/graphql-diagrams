@@ -1,4 +1,4 @@
-import { useRef, useEffect, PropsWithChildren } from 'react';
+import React from 'react';
 
 // This hook provides a wrapper to any React component.
 // Other than the React component as child, it accept a callback.
@@ -7,9 +7,8 @@ import { useRef, useEffect, PropsWithChildren } from 'react';
 // the callback function will be called whenever such event happens.
 // The most frequent usage is to watch click outside of the component,
 // if it's outside then hide the component.
-// @ts-ignore
 function useClickOutside(ref, onClickOutside?: (_: boolean) => void) {
-  useEffect(() => {
+  React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (ref.current && !ref.current.contains(event.target)) {
         onClickOutside && onClickOutside(true);
@@ -24,8 +23,8 @@ function useClickOutside(ref, onClickOutside?: (_: boolean) => void) {
   }, [ref, onClickOutside]);
 }
 
-export default function OutsideClickObserver(props: PropsWithChildren<{onClickOutside?: (_: boolean) => void}>) {
-  const wrapperRef = useRef(null);
+export default function OutsideClickObserver(props: React.PropsWithChildren<{onClickOutside?: (_: boolean) => void}>) {
+  const wrapperRef = React.useRef(null);
   useClickOutside(wrapperRef, props.onClickOutside);
   return <div ref={wrapperRef}>{props.children}</div>;
 }

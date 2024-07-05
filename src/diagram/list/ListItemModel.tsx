@@ -7,6 +7,7 @@ import {
   NodeModel,
   PortModel,
 } from '@projectstorm/react-diagrams';
+import React from 'react';
 import {Hideable} from '../core/Hideable';
 import {WithInOutPorts} from '../port/WithInOutPorts';
 
@@ -118,7 +119,7 @@ export abstract class ListItemModel<
     event: DeserializeEvent<BaseEntity>,
     data: any,
   ): T;
-  abstract renderContent(): JSX.Element;
+  abstract renderContent(): React.JSX.Element;
 
   doClone(lookupTable: {}, clone: any): void {
     clone.content = this.content;

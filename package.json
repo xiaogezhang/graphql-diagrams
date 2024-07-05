@@ -1,6 +1,6 @@
 {
   "name": "graphql-diagrams",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "license": "MIT",
   "author": "Xiaoge Zhang <xiaoge.zhang@gmail.com>",
   "repository": "https://github.com/xiaogezhang/graphql-diagrams",
@@ -25,7 +25,9 @@
     "tsup": "^8.1.0",
     "typescript": "^5.5.2",
     "webpack": "^5.92.1",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "pre-commit": "^1.2.2",
+    "ts-loader": "^9.5.1"
   },
   "scripts": {
     "build": "tsc && tsup",
@@ -61,10 +63,8 @@
     "@emotion/styled": "^11.11.0",
     "@projectstorm/react-diagrams": "^7.0.4",
     "graphql": "^16.6.0",
-    "pre-commit": "^1.2.2",
     "react": "^18.3.1",
-    "tinycolor2": "^1.6.0",
-    "ts-loader": "^9.5.1"
+    "tinycolor2": "^1.6.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

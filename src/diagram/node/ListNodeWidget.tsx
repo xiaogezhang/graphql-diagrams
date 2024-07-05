@@ -16,7 +16,6 @@ namespace Styled {
     border-radius: 5px;
     font-family: sans-serif;
     color: white;
-    border: solid 2px black;
     position: absolute;
     overflow: visible;
     font-size: 11px;

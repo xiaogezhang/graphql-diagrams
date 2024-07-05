@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import React from 'react';
 
 import {createTypeGraph} from './graphql/GraphQLTypeGraph';
 import {sdlToSchema} from './graphql/sdlToSchema';
@@ -7,11 +7,11 @@ import { DefaultDiagramEngine } from './DefaultDiagramEngine';
 
 export default function SchemaDiagram(props: {sdl?: string}) {
   const {sdl} = props;
-  const [currentModel, setCurrentModel] = useState<{
+  const [currentModel, setCurrentModel] = React.useState<{
     engine?: DefaultDiagramEngine;
     nodeCount?: number; 
   }>({});
-  useEffect(() => {
+  React.useEffect(() => {
     if (sdl) {
       const engine = new DefaultDiagramEngine();
       const {schema, errors} = sdlToSchema(sdl);
