@@ -2,11 +2,14 @@ import CanvasContext from './diagram/graphql/CanvasContext';
 import GraphQLDiagramContext from './diagram/graphql/GraphQLDiagramContext';
 import SchemaDiagram from './diagram/SchemaDiagram';
 import OutsideClickObserver from './diagram/core/hooks';
+import ExpandableContainer from './diagram/core/ExpndableContainer';
 import ListNodeWidget from './diagram/node/ListNodeWidget';
 import QueryPlanDiagram from './diagram/QueryPlanDiagram';
 import Canvas from './diagram/Canvas';
 
 export type {Hideable} from './diagram/core/Hideable';
+
+export {DefaultDiagramEngine} from './diagram/DefaultDiagramEngine';
 
 export {createQueryPlanGraph} from './diagram/graphql/queryPlan/QueryPlanGraph';
 
@@ -42,5 +45,5 @@ export {getTextColor} from './diagram/utils/color';
 
 export {type TreeNode, type LayoutConfig, layout} from './diagram/layout';
 
-export {Canvas, CanvasContext, GraphQLDiagramContext, SchemaDiagram, OutsideClickObserver, ListNodeWidget, QueryPlanDiagram} ;
+export {Canvas, CanvasContext, ExpandableContainer, GraphQLDiagramContext, SchemaDiagram, OutsideClickObserver, ListNodeWidget, QueryPlanDiagram} ;
 

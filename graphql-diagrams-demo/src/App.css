@@ -1,12 +1,46 @@
 #root {
-  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
 }
 
-.content {
-  min-width: 800px;
+.tabs {
+  min-width: 150px;
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 50px;
+  margin-top: 50px;
+}
+
+.code {
+  background-color: rgb(225, 225, 225);
+  border-radius: 8px;
+  width: 90%;
+  height: 85%;
+  overflow: scroll;
+  text-align: left;
+  white-space:pre;
+  padding: 16px;
+  scrollbar-color: cornflowerblue rgb(240,240,240);
+}
+
+.code::-webkit-scrollbar {
+  display: block;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  align-items: flex-start;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
 
 .logo {

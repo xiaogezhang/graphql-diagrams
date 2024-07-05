@@ -1,35 +1,35 @@
-query FetchBidsOffers($inputBids: BidsInput!, $inputOffers: OffersInput!) {
-  bids(input: $inputBids) {
+query FetchAdmissions($input: ApplicationsInput!, $inputAdmissions: AdmissionsInput!) {
+  applications(input: $inputApplications) {
     __typename
-    bids {
+    applications {
       __typename
-      listing {
+      opening {
         __typename
-        ...ListingFragment
+        ...openingFragment
       }
       status
       canDelete
     }
   }
-  offers(input: $inputOffers) {
+  admissions(input: $inputAdmissions) {
     __typename
-    offers {
+    admissions {
       __typename
-      listing {
+      opening {
         __typename
-        ...ListingFragment
+        ...openingFragment
       }
       status
       canDelete
       expirationDateTime
-      price {
+      score {
         __typename
-        ...ConvertedPriceFragment
+        ...ConvertedscoreFragment
       }
     }
   }
 }
-fragment ListingFragment on Listing {
+fragment openingFragment on opening {
   __typename
   id
   title
@@ -37,25 +37,25 @@ fragment ListingFragment on Listing {
     __typename
     ...ImageFragment
   }
-  minimalShippingCostToBuyer {
+  minimalRequirementForApplicant {
     __typename
     ...ShippingCostFragment
   }
-  bidCount
-  price {
+  applicationCount
+  score {
     __typename
-    highestBidPrice {
+    highestApplicationscore {
       __typename
-      ...ConvertedPriceFragment
+      ...ConvertedscoreFragment
     }
-    buyNowPrice {
+    specialAdmissionScore {
       __typename
-      ...ConvertedPriceFragment
+      ...ConvertedscoreFragment
     }
   }
-  primaryTax {
+  primaryApplicationFee {
     __typename
-    ...TaxFragment
+    ...ApplicationFeeFragment
   }
   endDate
 }
@@ -68,32 +68,32 @@ fragment ShippingCostFragment on ShippingCost {
   __typename
   cost {
     __typename
-    ...ConvertedPriceFragment
+    ...ConvertedscoreFragment
   }
   shippingType
   isFree
 }
-fragment ConvertedPriceFragment on ConvertedPrice {
+fragment ConvertedscoreFragment on Convertedscore {
   __typename
   converted {
     __typename
-    ...PriceFragment
+    ...scoreFragment
   }
   original {
     __typename
-    ...PriceFragment
+    ...scoreFragment
   }
 }
-fragment PriceFragment on Price {
+fragment scoreFragment on score {
   __typename
-  currency
+  criteria
   amount
 }
-fragment TaxFragment on Tax {
+fragment ApplicationFeeFragment on ApplicationFee {
   __typename
-  taxType
-  price {
+  applicationFeeType
+  score {
     __typename
-    ...ConvertedPriceFragment
+    ...ConvertedscoreFragment
   }
 }

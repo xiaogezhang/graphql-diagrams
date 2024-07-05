@@ -8,29 +8,29 @@
           "nodes": [
             {
               "kind": "Fetch",
-              "serviceName": "auctsvc",
+              "serviceName": "applicationssvc",
               "variableUsages": [
-                "inputBids"
+                "inputApplications"
               ],
-              "operation": "query FetchBidsOffers__auctsvc__0($inputBids:BidsInput!){bids(input:$inputBids){__typename bids{__typename listing{__typename id status}status canDelete}}}",
+              "operation": "query FetchApplicationsAdmissions__applicationssvc__0($inputApplications:ApplicationsInput!){applications(input:$inputApplications){__typename applications{__typename opening{__typename id status}status canDelete}}}",
               "operationKind": "query",
-              "operationName": "FetchBidsOffers__auctsvc__0"
+              "operationName": "FetchApplicationsAdmissions__applicationssvc__0"
             },
             {
               "kind": "Flatten",
               "path": [
-                "bids",
-                "bids",
+                "applications",
+                "applications",
                 "@",
-                "listing"
+                "opening"
               ],
               "node": {
                 "kind": "Fetch",
-                "serviceName": "listingsgql",
+                "serviceName": "openingsgql",
                 "requires": [
                   {
                     "kind": "InlineFragment",
-                    "typeCondition": "Listing",
+                    "typeCondition": "opening",
                     "selections": [
                       {
                         "kind": "Field",
@@ -48,9 +48,9 @@
                   }
                 ],
                 "variableUsages": [],
-                "operation": "query FetchBidsOffers__listingsgql__1($representations:[_Any!]!){_entities(representations:$representations){...on Listing{title image{__typename id url}minimalShippingCostToBuyer{__typename cost{...ConvertedPriceFragment}shippingType isFree}bidCount price{__typename highestBidPrice{...ConvertedPriceFragment}buyNowPrice{...ConvertedPriceFragment}}primaryTax{__typename taxType price{...ConvertedPriceFragment}}endDate}}}fragment PriceFragment on Price{__typename currency amount}fragment ConvertedPriceFragment on ConvertedPrice{__typename converted{...PriceFragment}original{...PriceFragment}}",
+                "operation": "query FetchApplicationsAdmissions__openingsgql__1($representations:[_Any!]!){_entities(representations:$representations){...on opening{title image{__typename id url}minimalRequirementForApplicant{__typename cost{...ConvertedscoreFragment}shippingType isFree}applicationCount score{__typename highestApplicationscore{...ConvertedscoreFragment}specialAdmissionScore{...ConvertedscoreFragment}}primaryApplicationFee{__typename applicationFeeType score{...ConvertedscoreFragment}}endDate}}}fragment scoreFragment on score{__typename criteria amount}fragment ConvertedscoreFragment on Convertedscore{__typename converted{...scoreFragment}original{...scoreFragment}}",
                 "operationKind": "query",
-                "operationName": "FetchBidsOffers__listingsgql__1"
+                "operationName": "FetchApplicationsAdmissions__openingsgql__1"
               }
             }
           ]
@@ -60,29 +60,29 @@
           "nodes": [
             {
               "kind": "Fetch",
-              "serviceName": "bosvc",
+              "serviceName": "admissionssvc",
               "variableUsages": [
-                "inputOffers"
+                "inputAdmissions"
               ],
-              "operation": "query FetchBidsOffers__bosvc__2($inputOffers:OffersInput!){offers(input:$inputOffers){__typename offers{__typename listing{__typename id status}status canDelete expirationDateTime price{__typename converted{...PriceFragment}original{...PriceFragment}}}}}fragment PriceFragment on Price{__typename currency amount}",
+              "operation": "query FetchApplicationsAdmissions__admissionssvc__2($inputAdmissions:AdmissionsInput!){admissions(input:$inputAdmissions){__typename admissions{__typename opening{__typename id status}status canDelete expirationDateTime score{__typename converted{...scoreFragment}original{...scoreFragment}}}}}fragment scoreFragment on score{__typename criteria amount}",
               "operationKind": "query",
-              "operationName": "FetchBidsOffers__bosvc__2"
+              "operationName": "FetchApplicationsAdmissions__admissionssvc__2"
             },
             {
               "kind": "Flatten",
               "path": [
-                "offers",
-                "offers",
+                "admissions",
+                "admissions",
                 "@",
-                "listing"
+                "opening"
               ],
               "node": {
                 "kind": "Fetch",
-                "serviceName": "listingsgql",
+                "serviceName": "openingsgql",
                 "requires": [
                   {
                     "kind": "InlineFragment",
-                    "typeCondition": "Listing",
+                    "typeCondition": "opening",
                     "selections": [
                       {
                         "kind": "Field",
@@ -100,9 +100,9 @@
                   }
                 ],
                 "variableUsages": [],
-                "operation": "query FetchBidsOffers__listingsgql__3($representations:[_Any!]!){_entities(representations:$representations){...on Listing{title image{__typename id url}minimalShippingCostToBuyer{__typename cost{...ConvertedPriceFragment}shippingType isFree}bidCount price{__typename highestBidPrice{...ConvertedPriceFragment}buyNowPrice{...ConvertedPriceFragment}}primaryTax{__typename taxType price{...ConvertedPriceFragment}}endDate}}}fragment PriceFragment on Price{__typename currency amount}fragment ConvertedPriceFragment on ConvertedPrice{__typename converted{...PriceFragment}original{...PriceFragment}}",
+                "operation": "query FetchApplicationsAdmissions__openingsgql__3($representations:[_Any!]!){_entities(representations:$representations){...on opening{title image{__typename id url}minimalRequirementForApplicant{__typename cost{...ConvertedscoreFragment}shippingType isFree}applicationCount score{__typename highestApplicationscore{...ConvertedscoreFragment}specialAdmissionScore{...ConvertedscoreFragment}}primaryApplicationFee{__typename applicationFeeType score{...ConvertedscoreFragment}}endDate}}}fragment scoreFragment on score{__typename criteria amount}fragment ConvertedscoreFragment on Convertedscore{__typename converted{...scoreFragment}original{...scoreFragment}}",
                 "operationKind": "query",
-                "operationName": "FetchBidsOffers__listingsgql__3"
+                "operationName": "FetchApplicationsAdmissions__openingsgql__3"
               }
             }
           ]
