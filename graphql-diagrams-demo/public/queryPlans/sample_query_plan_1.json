@@ -1,0 +1,112 @@
+{
+    "kind": "QueryPlan",
+    "node": {
+      "kind": "Parallel",
+      "nodes": [
+        {
+          "kind": "Sequence",
+          "nodes": [
+            {
+              "kind": "Fetch",
+              "serviceName": "auctsvc",
+              "variableUsages": [
+                "inputBids"
+              ],
+              "operation": "query FetchBidsOffers__auctsvc__0($inputBids:BidsInput!){bids(input:$inputBids){__typename bids{__typename listing{__typename id status}status canDelete}}}",
+              "operationKind": "query",
+              "operationName": "FetchBidsOffers__auctsvc__0"
+            },
+            {
+              "kind": "Flatten",
+              "path": [
+                "bids",
+                "bids",
+                "@",
+                "listing"
+              ],
+              "node": {
+                "kind": "Fetch",
+                "serviceName": "listingsgql",
+                "requires": [
+                  {
+                    "kind": "InlineFragment",
+                    "typeCondition": "Listing",
+                    "selections": [
+                      {
+                        "kind": "Field",
+                        "name": "__typename"
+                      },
+                      {
+                        "kind": "Field",
+                        "name": "id"
+                      },
+                      {
+                        "kind": "Field",
+                        "name": "status"
+                      }
+                    ]
+                  }
+                ],
+                "variableUsages": [],
+                "operation": "query FetchBidsOffers__listingsgql__1($representations:[_Any!]!){_entities(representations:$representations){...on Listing{title image{__typename id url}minimalShippingCostToBuyer{__typename cost{...ConvertedPriceFragment}shippingType isFree}bidCount price{__typename highestBidPrice{...ConvertedPriceFragment}buyNowPrice{...ConvertedPriceFragment}}primaryTax{__typename taxType price{...ConvertedPriceFragment}}endDate}}}fragment PriceFragment on Price{__typename currency amount}fragment ConvertedPriceFragment on ConvertedPrice{__typename converted{...PriceFragment}original{...PriceFragment}}",
+                "operationKind": "query",
+                "operationName": "FetchBidsOffers__listingsgql__1"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "Sequence",
+          "nodes": [
+            {
+              "kind": "Fetch",
+              "serviceName": "bosvc",
+              "variableUsages": [
+                "inputOffers"
+              ],
+              "operation": "query FetchBidsOffers__bosvc__2($inputOffers:OffersInput!){offers(input:$inputOffers){__typename offers{__typename listing{__typename id status}status canDelete expirationDateTime price{__typename converted{...PriceFragment}original{...PriceFragment}}}}}fragment PriceFragment on Price{__typename currency amount}",
+              "operationKind": "query",
+              "operationName": "FetchBidsOffers__bosvc__2"
+            },
+            {
+              "kind": "Flatten",
+              "path": [
+                "offers",
+                "offers",
+                "@",
+                "listing"
+              ],
+              "node": {
+                "kind": "Fetch",
+                "serviceName": "listingsgql",
+                "requires": [
+                  {
+                    "kind": "InlineFragment",
+                    "typeCondition": "Listing",
+                    "selections": [
+                      {
+                        "kind": "Field",
+                        "name": "__typename"
+                      },
+                      {
+                        "kind": "Field",
+                        "name": "id"
+                      },
+                      {
+                        "kind": "Field",
+                        "name": "status"
+                      }
+                    ]
+                  }
+                ],
+                "variableUsages": [],
+                "operation": "query FetchBidsOffers__listingsgql__3($representations:[_Any!]!){_entities(representations:$representations){...on Listing{title image{__typename id url}minimalShippingCostToBuyer{__typename cost{...ConvertedPriceFragment}shippingType isFree}bidCount price{__typename highestBidPrice{...ConvertedPriceFragment}buyNowPrice{...ConvertedPriceFragment}}primaryTax{__typename taxType price{...ConvertedPriceFragment}}endDate}}}fragment PriceFragment on Price{__typename currency amount}fragment ConvertedPriceFragment on ConvertedPrice{__typename converted{...PriceFragment}original{...PriceFragment}}",
+                "operationKind": "query",
+                "operationName": "FetchBidsOffers__listingsgql__3"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }

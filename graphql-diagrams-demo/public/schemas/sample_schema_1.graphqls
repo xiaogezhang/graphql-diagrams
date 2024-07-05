@@ -1,0 +1,102 @@
+schema @link(import : ["@key", "@shareable", "@extends", "@inaccessible"], url : "https://specs.apollo.dev/federation/v2.0"){
+  query: Query
+  mutation: Mutation
+}
+
+directive @extends on OBJECT | INTERFACE
+
+directive @federation__external on OBJECT | FIELD_DEFINITION
+
+directive @federation__override(from: String!) on FIELD_DEFINITION
+
+directive @federation__provides(fields: federation__FieldSet!) on FIELD_DEFINITION
+
+directive @federation__requires(fields: federation__FieldSet!) on FIELD_DEFINITION
+
+directive @inaccessible on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | INTERFACE | UNION | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+directive @key(fields: federation__FieldSet!, resolvable: Boolean = true) repeatable on OBJECT | INTERFACE
+
+directive @link(as: String, import: [link__Import], url: String!) repeatable on SCHEMA
+
+directive @shareable on OBJECT | FIELD_DEFINITION
+
+directive @tag(name: String!) repeatable on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | INTERFACE | UNION | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+type GeneralDescriptionOutput @shareable {
+  id: ID!
+  description: String
+  modelName: String
+}
+
+type Mutation {
+  saveGeneralDescriptionFeedback(input: SaveGeneralDescriptionFeedbackInput!): SaveGeneralDescriptionFeedbackOutput!
+}
+
+type Query {
+  _service: _Service!
+  generativeDescription(input: GeneralDescriptionInput!): GeneralDescriptionOutput! @shareable
+}
+
+type SaveGeneralDescriptionFeedbackOutput {
+  id: ID!
+  userSubmittedDescription: String
+}
+
+type _Service {
+  sdl: String!
+}
+
+enum InputOrigin {
+  EXTRACTED
+  CONSUMER
+}
+
+enum ErrorDetail {
+  DEADLINE_EXCEEDED
+  FIELD_NOT_FOUND
+  INVALID_ARGUMENT
+  MISSING_RESOURCE
+  SERVICE_ERROR
+  TCP_FAILURE
+  UNKNOWN
+}
+
+enum ErrorType {
+  BAD_REQUEST
+  NOT_FOUND
+  PERMISSION_DENIED
+  UNAUTHENTICATED
+  UNAVAILABLE
+  UNKNOWN
+}
+
+scalar federation__FieldSet
+
+scalar link__Import
+
+input ValueInput {
+  origin: InputOrigin! = EXTRACTED
+  value: String!
+}
+
+input GeneralDescriptionInput {
+  inputs: [ProductInput]
+  categoryId: ID
+  categoryNames: [String!]
+  conditionId: ID
+  conditionName: String
+  draftId: ID
+  title: String
+}
+
+input ProductInput {
+  values: [ValueInput!]!
+  displayName: String!
+}
+
+input SaveGeneralDescriptionFeedbackInput {
+  id: ID!
+  draftId: ID
+  userSubmittedDescription: String
+}

@@ -1,0 +1,99 @@
+query FetchBidsOffers($inputBids: BidsInput!, $inputOffers: OffersInput!) {
+  bids(input: $inputBids) {
+    __typename
+    bids {
+      __typename
+      listing {
+        __typename
+        ...ListingFragment
+      }
+      status
+      canDelete
+    }
+  }
+  offers(input: $inputOffers) {
+    __typename
+    offers {
+      __typename
+      listing {
+        __typename
+        ...ListingFragment
+      }
+      status
+      canDelete
+      expirationDateTime
+      price {
+        __typename
+        ...ConvertedPriceFragment
+      }
+    }
+  }
+}
+fragment ListingFragment on Listing {
+  __typename
+  id
+  title
+  image {
+    __typename
+    ...ImageFragment
+  }
+  minimalShippingCostToBuyer {
+    __typename
+    ...ShippingCostFragment
+  }
+  bidCount
+  price {
+    __typename
+    highestBidPrice {
+      __typename
+      ...ConvertedPriceFragment
+    }
+    buyNowPrice {
+      __typename
+      ...ConvertedPriceFragment
+    }
+  }
+  primaryTax {
+    __typename
+    ...TaxFragment
+  }
+  endDate
+}
+fragment ImageFragment on Image {
+  __typename
+  id
+  url
+}
+fragment ShippingCostFragment on ShippingCost {
+  __typename
+  cost {
+    __typename
+    ...ConvertedPriceFragment
+  }
+  shippingType
+  isFree
+}
+fragment ConvertedPriceFragment on ConvertedPrice {
+  __typename
+  converted {
+    __typename
+    ...PriceFragment
+  }
+  original {
+    __typename
+    ...PriceFragment
+  }
+}
+fragment PriceFragment on Price {
+  __typename
+  currency
+  amount
+}
+fragment TaxFragment on Tax {
+  __typename
+  taxType
+  price {
+    __typename
+    ...ConvertedPriceFragment
+  }
+}
