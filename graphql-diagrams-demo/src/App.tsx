@@ -109,7 +109,7 @@ export default function App() {
            <div>Sample schema file, sample query file and sample query plan file are loaded from server. </div>
            <div>GitHub: <a href="https://github.com/xiaogezhang/graphql-diagrams" target="_blank">https://github.com/xiaogezhang/graphql-diagrams</a></div>
            <div>To Install: "yarn add graphql-diagrams" or "npm i graphql-diagrams" </div>
-           <div>To run the demo: "yarn && yarn build && yarn dev" </div>
+           <div>To run the demo, enter folder graphql-diagrams-demo, run: "yarn && yarn build && yarn dev", and open url: <a href="http://localhost:5173" target="_blank"> </div>
            </div>
          </div>
        </div>
