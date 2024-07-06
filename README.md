@@ -8,3 +8,4 @@ To run the demo, go to graphql-diagrams-demo, run "yarn && yarn build && yarn de
 
 In browser, open http://localhost:5173"
 
+Visit demo at: https://graphql-diagrams.vercel.app/
