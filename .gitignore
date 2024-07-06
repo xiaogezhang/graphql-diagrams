@@ -50,3 +50,4 @@ dll
 .beans
 .npmrc
 .yarnrc
+.vercel
