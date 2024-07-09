@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mui/material": "^5.15.21",
-    "graphql-diagrams": "^1.0.21",
+    "graphql-diagrams": "^1.0.24",
     "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-diagrams": "^1.0.1",
