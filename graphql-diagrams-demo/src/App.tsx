@@ -123,7 +123,7 @@ export default function App() {
                   header={<a href="https://graphql.org/learn/schema/" rel="noopener" target="_blank">
                     Doc: GraphQL Schema
                   </a>}>
-                  <SchemaDiagram sdl={schema}/>
+                  <SchemaDiagram sdl={schema} showOptions={true}/>
                 </ExpandableDiagram>} 
               right={<div className="code">{schema}</div>}/> : <CircularProgress />
          }
