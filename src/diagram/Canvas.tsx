@@ -3,10 +3,6 @@ import styled from '@emotion/styled';
 import {
   DiagramEngine,
 } from '@projectstorm/react-diagrams';
-import {
-  defaultTypeGraphOptions,
-  TypeGraphOptions,
-} from './graphql/GraphQLDiagramContext';
 import CanvasContext from './graphql/CanvasContext';
 import { CanvasWidget } from './CanvasWidget';
 
@@ -21,28 +17,6 @@ namespace Styled {
     width: ${(p) => (p.columns ?? 4) * (p.nodeWidth ?? 150)}px;
     min-height: ${(p) => (p.rows ?? 4) * (p.nodeHeight ?? 150)}px;
   `;
-
-  export const Float = styled.div`
-    position: fixed;
-    bottom: 36px;
-    left: 24px;
-    margin-left: 48px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    flex-direction: row;
-    flow-wrap: nowrap;
-    background: Silver;
-    opacity: 0.9;
-    border-radius: 8px;
-  `;
-
-  export const Checkbox = styled.input`
-    margin-right: 4px;
-  `;
-
-  export const Label = styled.label`
-    padding: 12px;
-  `;
 }
 
 export default function Canvas(props: {
@@ -51,12 +25,10 @@ export default function Canvas(props: {
   columns?: number;
   nodeWidth?: number;
   nodeHeight?: number;
-  showOptions?: boolean;
+  
 }) {
-  const {engine, rows, columns, nodeWidth, nodeHeight, showOptions} = props;
-  const [options, setOptions] = React.useState<TypeGraphOptions>(
-    defaultTypeGraphOptions,
-  );
+  const {engine, rows, columns, nodeWidth, nodeHeight} = props;
+  
   const scrollCanvas = React.useCallback(
     (x: number, y: number) => {
       // below doesn't work, as the canvas model maintains offsetX and offsetY
@@ -108,58 +80,6 @@ export default function Canvas(props: {
           nodeHeight={nodeHeight}
         />
       </CanvasContext.Provider>
-      {!showOptions ? null : (
-        <Styled.Float>
-          <Styled.Label>
-            <Styled.Checkbox
-              id="meta-links"
-              type="checkbox"
-              color="primary"
-              checked={options.createMetaLinks}
-              onChange={() =>
-                setOptions({
-                  createMetaLinks: !options.createMetaLinks,
-                  createInheritanceLinks: options.createInheritanceLinks,
-                  createInputObjectTypes: options.createInputObjectTypes,
-                })
-              }
-            />
-            Show Meta Links
-          </Styled.Label>
-          <Styled.Label>
-            <Styled.Checkbox
-              id="inheritance"
-              type="checkbox"
-              color="primary"
-              checked={options.createInheritanceLinks}
-              onChange={() =>
-                setOptions({
-                  createMetaLinks: options.createMetaLinks,
-                  createInheritanceLinks: !options.createInheritanceLinks,
-                  createInputObjectTypes: options.createInputObjectTypes,
-                })
-              }
-            />
-            Show Inheritance
-          </Styled.Label>
-          <Styled.Label>
-            <Styled.Checkbox
-              id="input-object-types"
-              type="checkbox"
-              color="primary"
-              checked={options.createInputObjectTypes}
-              onChange={() =>
-                setOptions({
-                  createMetaLinks: options.createMetaLinks,
-                  createInheritanceLinks: options.createInheritanceLinks,
-                  createInputObjectTypes: !options.createInputObjectTypes,
-                })
-              }
-            />
-            Show Input Object Types
-          </Styled.Label>
-        </Styled.Float>
-      )}
     </>
   );
 }

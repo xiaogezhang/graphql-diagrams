@@ -361,9 +361,9 @@ export function createTypeGraph(
   }
   const schemaConfig = schema.toConfig();
 
-  const createMetaLinks = options?.createMetaLinks ?? false;
-  const createInheritanceLinks = options?.createInheritanceLinks ?? false;
-  // const createInputObjectTypes = options?.createInputObjectTypes ?? false;
+  const showMetaLinks = options?.showMetaLinks ?? false;
+  const showInheritanceLinks = options?.showInheritanceLinks ?? false;
+  const showInputObjectTypes = options?.showInputObjectTypes ?? false;
 
   const nodesMap = new Map<string, ListNodeModel>();
 
@@ -381,11 +381,13 @@ export function createTypeGraph(
     {name: 'Query', color: 'LightGreen'},
     {name: 'Mutation', color: 'Plum'},
     {name: 'Enums', color: 'Pink'},
-    {name: 'Input Object Types', color: 'LightCyan'},
     {name: 'Union Types', color: 'SlateGrey'},
     {name: 'Interfaces', color: 'LightGoldenRodYellow'},
     {name: 'Subscriptions', color: 'PaleGreen'},
   ];
+  if (showInputObjectTypes) {
+    schemaRows.push({name: 'Input Object Types', color: 'LightCyan'});
+  }
   const schemaTreeNode: TreeNode = {
     node: schemaNode,
     rowsCount: schemaRows.length,
@@ -428,10 +430,10 @@ export function createTypeGraph(
   const queryNode = schemaOutTargetNodes[3];
   const mutationNode = schemaOutTargetNodes[4];
   const enumsNode = schemaOutTargetNodes[5];
-  const inputObjectTypesNode = schemaOutTargetNodes[6];
-  const unionTypesNode = schemaOutTargetNodes[7];
-  const interfacesNode = schemaOutTargetNodes[8];
-  const subscriptionsNode = schemaOutTargetNodes[9];
+  const unionTypesNode = schemaOutTargetNodes[6];
+  const interfacesNode = schemaOutTargetNodes[7];
+  const subscriptionsNode = schemaOutTargetNodes[8];
+  const inputObjectTypesNode = showInputObjectTypes ? schemaOutTargetNodes[9] : null;
 
   const directives = schemaConfig.directives;
   directives.forEach((directive) => {
@@ -484,34 +486,36 @@ export function createTypeGraph(
     children: [],
   };
   schemaTreeNode.children.push(enumsTreeNode);
-  const inputObjectTypesTreeNode: TreeNode = {
-    node: inputObjectTypesNode,
-    rowsCount: 0,
-    width: schemaRows[6].name.length,
-    children: [],
-  };
-  schemaTreeNode.children.push(inputObjectTypesTreeNode);
   const unionTypesTreeNode: TreeNode = {
     node: unionTypesNode,
     rowsCount: 0,
-    width: schemaRows[7].name.length,
+    width: schemaRows[6].name.length,
     children: [],
   };
   schemaTreeNode.children.push(unionTypesTreeNode);
   const interfacesTreeNode: TreeNode = {
     node: interfacesNode,
     rowsCount: 0,
-    width: schemaRows[8].name.length,
+    width: schemaRows[7].name.length,
     children: [],
   };
   schemaTreeNode.children.push(interfacesTreeNode);
   const subscriptionsTreeNode: TreeNode = {
     node: subscriptionsNode,
     rowsCount: 0,
-    width: schemaRows[9].name.length,
+    width: schemaRows[8].name.length,
     children: [],
   };
   schemaTreeNode.children.push(subscriptionsTreeNode);
+  const inputObjectTypesTreeNode: TreeNode | null = showInputObjectTypes && inputObjectTypesNode ? {
+    node: inputObjectTypesNode,
+    rowsCount: 0,
+    width: schemaRows[9].name.length,
+    children: [],
+  } : null;
+  if (inputObjectTypesTreeNode) {
+    schemaTreeNode.children.push(inputObjectTypesTreeNode);
+  }
 
   const types = schemaConfig.types;
   const queryType = schemaConfig.query;
@@ -541,7 +545,7 @@ export function createTypeGraph(
           type,
           nodesMap,
           TypeNodeColor,
-          createMetaLinks,
+          showMetaLinks,
         );
       } else if (isEnumType(type)) {
         createTypeRowAndNode(
@@ -550,17 +554,19 @@ export function createTypeGraph(
           type,
           nodesMap,
           EnumColor,
-          createMetaLinks,
+          showMetaLinks,
         );
       } else if (isInputObjectType(type)) {
-        createTypeRowAndNode(
-          diagramModel,
-          inputObjectTypesTreeNode,
-          type,
-          nodesMap,
-          InputObjectTypeColor,
-          createMetaLinks,
-        );
+        if (showInputObjectTypes && inputObjectTypesTreeNode) {
+          createTypeRowAndNode(
+            diagramModel,
+            inputObjectTypesTreeNode,
+            type,
+            nodesMap,
+            InputObjectTypeColor,
+            showMetaLinks,
+          );
+        }
       } else if (isUnionType(type)) {
         createTypeRowAndNode(
           diagramModel,
@@ -568,7 +574,7 @@ export function createTypeGraph(
           type,
           nodesMap,
           UnionTypeColor,
-          createMetaLinks,
+          showMetaLinks,
         );
       } else if (isInterfaceType(type)) {
         createTypeRowAndNode(
@@ -577,7 +583,7 @@ export function createTypeGraph(
           type,
           nodesMap,
           InterfaceNodeColor,
-          createMetaLinks,
+          showMetaLinks,
         );
       }
     }
@@ -597,7 +603,7 @@ export function createTypeGraph(
       nodesMap,
     );
   }
-  if (createInheritanceLinks) {
+  if (showInheritanceLinks) {
     addImplementsLinks(schema, nodesMap, diagramModel);
   }
 
@@ -617,7 +623,7 @@ function createTypeRowAndNode(
     | GraphQLEnumType,
   nodesMap: Map<string, ListNodeModel>,
   typeNodeColor: string,
-  createMetaLinks: boolean,
+  showMetaLinks: boolean,
 ): void {
   const typesNode = typesTreeNode.node;
   const typeRow = typesNode.createItem(SimpleTextListItemType);
@@ -643,7 +649,7 @@ function createTypeRowAndNode(
   }
   if (typeNode) {
     const typeInPort = typeNode.getInPort();
-    if (createMetaLinks && typeInPort) {
+    if (showMetaLinks && typeInPort) {
       const typeLink = typeRowPort.link<DefaultLinkModel>(typeInPort);
       typeLink.setWidth(2);
       typeLink.setColor(metaTypeLinkColor);

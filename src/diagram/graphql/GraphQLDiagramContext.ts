@@ -1,15 +1,15 @@
 import {createContext} from 'react';
 
 export interface TypeGraphOptions {
-  createMetaLinks?: boolean;
-  createInheritanceLinks?: boolean;
-  createInputObjectTypes?: boolean;
+  showMetaLinks?: boolean;
+  showInheritanceLinks?: boolean;
+  showInputObjectTypes?: boolean;
 }
 
 export const defaultTypeGraphOptions: TypeGraphOptions = {
-  createMetaLinks: true,
-  createInheritanceLinks: true,
-  createInputObjectTypes: true,
+  showMetaLinks: false,
+  showInheritanceLinks: false,
+  showInputObjectTypes: false,
 };
 
 /**
