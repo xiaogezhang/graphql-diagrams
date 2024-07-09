@@ -9,10 +9,9 @@ import { TypeGraphOptions, defaultTypeGraphOptions } from './graphql/GraphQLDiag
 
 namespace Styled {
   export const Float = styled.div`
-    position: fixed;
-    bottom: 36px;
-    left: 24px;
-    margin-left: 48px;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
     padding-top: 8px;
     padding-bottom: 8px;
     flex-direction: row;
