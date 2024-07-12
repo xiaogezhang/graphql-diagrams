@@ -7,7 +7,7 @@ import { CircularProgress } from '@mui/material';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { ExpandableContainer, HiddenDisplayOptions, QueryPlanDiagram, SchemaDiagram } from 'graphql-diagrams';
+import { ExpandableContainer, GraphQLDiagramElementType, QueryPlanDiagram, SchemaDiagram } from 'graphql-diagrams';
 
 function TwoTabs(props: {
   left: React.JSX.Element;
@@ -77,7 +77,9 @@ export default function App() {
     fetchData();
   }, [activeTab, queryPlan, queryStr, schema]);
 
-  const displayOptions: HiddenDisplayOptions = {};
+  const displayOptions: {
+    [index: string]: boolean;
+  } = {};
   displayOptions[GraphQLDiagramElementType.META_LINK] = true;
   displayOptions[GraphQLDiagramElementType.INHERITANCE_LINK] = true;
   displayOptions[GraphQLDiagramElementType.INPUT_OBJECT_TYPE] = true;
