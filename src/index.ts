@@ -7,6 +7,8 @@ import QueryPlanDiagram from './diagram/QueryPlanDiagram';
 import Canvas from './diagram/Canvas';
 import DiagramContext from './diagram/DiagramContext';
 
+export {type HiddenDisplayOptions} from './diagram/DiagramContext';
+
 export {HideableWidget} from './diagram/core/HideableWidget';
 
 export {type DiagramElement} from './diagram/core/DiagramElement';

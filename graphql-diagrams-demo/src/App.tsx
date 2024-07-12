@@ -7,7 +7,7 @@ import { CircularProgress } from '@mui/material';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { ExpandableContainer, QueryPlanDiagram, SchemaDiagram } from 'graphql-diagrams';
+import { ExpandableContainer, HiddenDisplayOptions, QueryPlanDiagram, SchemaDiagram } from 'graphql-diagrams';
 
 function TwoTabs(props: {
   left: React.JSX.Element;
@@ -77,6 +77,14 @@ export default function App() {
     fetchData();
   }, [activeTab, queryPlan, queryStr, schema]);
 
+  const displayOptions: HiddenDisplayOptions = {};
+  displayOptions[GraphQLDiagramElementType.META_LINK] = true;
+  displayOptions[GraphQLDiagramElementType.INHERITANCE_LINK] = true;
+  displayOptions[GraphQLDiagramElementType.INPUT_OBJECT_TYPE] = true;
+  displayOptions[GraphQLDiagramElementType.INTERFACE] = false;
+  displayOptions[GraphQLDiagramElementType.ENUM_TYPE] = false;
+  displayOptions[GraphQLDiagramElementType.OBJECT_TYPE] = false;
+
   return (
     <Box width={window.innerWidth - 100} height={window.innerHeight - 20} gap={2} overflow='hidden' 
       sx={{justifyContent: 'flex-start', flexGrow: 1, display: 'flex'}}>
@@ -123,7 +131,7 @@ export default function App() {
                   header={<a href="https://graphql.org/learn/schema/" rel="noopener" target="_blank">
                     Doc: GraphQL Schema
                   </a>}>
-                  <SchemaDiagram sdl={schema} showOptions={true}/>
+                  <SchemaDiagram sdl={schema} displayOptions={displayOptions}/>
                 </ExpandableDiagram>} 
               right={<div className="code">{schema}</div>}/> : <CircularProgress />
          }
