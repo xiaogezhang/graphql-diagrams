@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import Canvas from './Canvas';
 import {createQueryPlanGraph} from './graphql/queryPlan/QueryPlanGraph';
@@ -9,12 +9,12 @@ export default function QueryPlanDiagram(props: {
   queryStr?: string;
 }) {
   const {queryPlan, queryStr} = props;
-  const [currentModel, setCurrentModel] = React.useState<{
+  const [currentModel, setCurrentModel] = useState<{
     engine?: DefaultDiagramEngine;
     nodeCount?: number;
     error?: Error,
   }>({});
-  React.useEffect(() => {
+  useEffect(() => {
     try {
       const engine = new DefaultDiagramEngine();
       const model = queryPlan ? createQueryPlanGraph(queryPlan, queryStr) : null;

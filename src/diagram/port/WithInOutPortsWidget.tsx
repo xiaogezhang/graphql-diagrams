@@ -1,5 +1,4 @@
 import * as React from 'react';
-import _map from 'lodash/map';
 import {DiagramEngine, PortWidget} from '@projectstorm/react-diagrams-core';
 import styled from '@emotion/styled';
 import { WithInOutPorts } from './WithInOutPorts';

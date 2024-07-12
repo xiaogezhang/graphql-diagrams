@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import {ListNodeModel} from './ListNodeModel';
 import {ListItemModel} from '../list/ListItemModel';
 import {WithInOutPortsWidget} from '../port/WithInOutPortsWidget';
+import { HideableWidget } from '../core/HideableWidget';
 
 namespace Styled {
   export const Node = styled.div<{
@@ -101,25 +102,26 @@ export default function ListNodeWidget(props: ListNodeProps) {
   };
   const header = node.getHeader();
 
-  return (
-    <Styled.Node
-      data-default-node-name={node.getOptions().name}
-      selected={node.isSelected()}
-      grabbing={grabbing}
-      id={node.getID()}
-      key={node.getID()}
-      onMouseDown={() => setGrabbing(true)}
-      onMouseUp={() => setGrabbing(false)}
-      background={node.getOptions().color}>
-      <Styled.Title key="title">
-        <WithInOutPortsWidget model={node} engine={engine} key="title">
-          {header ? 
-              header.renderContent() :
-            <Styled.TitleName key="titleName">{node.getOptions().name}</Styled.TitleName>
-          }
-        </WithInOutPortsWidget>
-      </Styled.Title>
-      <Styled.Items key="items">{_map(node.getItems(), createItem)}</Styled.Items>
-    </Styled.Node>
-  );
+  return <HideableWidget component={node}> 
+      <Styled.Node
+        data-default-node-name={node.getOptions().name}
+        selected={node.isSelected()}
+        grabbing={grabbing}
+        id={node.getID()}
+        key={node.getID()}
+        onMouseDown={() => setGrabbing(true)}
+        onMouseUp={() => setGrabbing(false)}
+        background={node.getOptions().color}>
+        <Styled.Title key="title">
+          <WithInOutPortsWidget model={node} engine={engine} key="title">
+            {header ? 
+               header.renderContent() :
+             <Styled.TitleName key="titleName">{node.getOptions().name}</Styled.TitleName>
+            }
+          </WithInOutPortsWidget>
+        </Styled.Title>
+        <Styled.Items key="items">{_map(node.getItems(), createItem)}</Styled.Items>
+      </Styled.Node>
+    </HideableWidget>
+  ;
 }

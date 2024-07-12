@@ -1,5 +1,6 @@
+
 export interface Hideable {
-  isVisible(): boolean;
+  isVisible(isTypeVisible: (elementType: string) => boolean): boolean;
 
   hide(): void;
 

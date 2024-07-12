@@ -1,11 +1,14 @@
-import React from 'react';
+import React, {useContext, useState} from 'react';
 
-import {createTypeGraph} from './graphql/GraphQLTypeGraph';
-import {sdlToSchema} from './graphql/sdlToSchema';
+import {useGraphQLTypeGraph} from './graphql/GraphQLTypeGraph';
 import Canvas from './Canvas';
-import { DefaultDiagramEngine } from './DefaultDiagramEngine';
 import styled from '@emotion/styled';
-import { TypeGraphOptions, defaultTypeGraphOptions } from './graphql/GraphQLDiagramContext';
+import DiagramContext, {DiagramOptions, HiddenDisplayOptions, createDiagramOptions} from './DiagramContext';
+import {
+  GraphQLDiagramElementType,
+  PluralDisplayLabelsMap,
+} from './graphql/GraphQLNodeTypes';
+import { DiagramEngine } from '@projectstorm/react-diagrams';
 
 namespace Styled {
   export const Float = styled.div`
@@ -15,10 +18,10 @@ namespace Styled {
     padding-top: 8px;
     padding-bottom: 8px;
     flex-direction: row;
-    flow-wrap: nowrap;
     background: Silver;
     opacity: 0.9;
     border-radius: 8px;
+    max-width: 40%;
   `;
 
   export const Checkbox = styled.input`
@@ -30,94 +33,61 @@ namespace Styled {
   `;
 }
 
-export default function SchemaDiagram(props: {sdl?: string, showOptions?: boolean;}) {
-  const {sdl, showOptions} = props;
-  const [options, setOptions] = React.useState<TypeGraphOptions>(
-    defaultTypeGraphOptions,
+export default function SchemaDiagram(props: {
+  sdl?: string;
+  displayOptions?: HiddenDisplayOptions;
+}) {
+  const {sdl, displayOptions} = props;
+  const [diagramOptions, setDiagramOptions] = useState<DiagramOptions>(
+    createDiagramOptions(displayOptions),
   );
-  const [currentModel, setCurrentModel] = React.useState<{
-    engine?: DefaultDiagramEngine;
-    nodeCount?: number; 
-  }>({});
-  React.useEffect(() => {
-    if (sdl) {
-      const engine = new DefaultDiagramEngine();
-      const {schema, errors} = sdlToSchema(sdl);
-      const model = createTypeGraph(errors, schema, options);
-      const nodeCount = (Object.values(schema?.getTypeMap() ?? {}).length ?? 10) + (errors ? (errors.length + 4)  : 10);
-      if (model) {
-        engine.setModel(model);
-      }
-      setCurrentModel(_ => ({
-        engine: engine,
-        nodeCount: nodeCount,
-      }));
+  const {engine, nodeCount} = useGraphQLTypeGraph(sdl);
+  const [, forceUpdate] = React.useReducer((x) => x + 1, 0);
+  const optionKeys = displayOptions ? Object.keys(displayOptions) : null;
+  const options = optionKeys && optionKeys.length > 0? 
+    <Styled.Float>
+    {
+      optionKeys.map((t, index) => (
+        <Styled.Label key={index}>
+          <Styled.Checkbox
+            id={t}
+            type="checkbox"
+            color="primary"
+            checked={diagramOptions.isVisible(t)}
+            onChange={() => {
+              const newDisplayOptions: HiddenDisplayOptions = {};
+              optionKeys.forEach(k => {
+                if (k === t) {
+                  newDisplayOptions[k] = diagramOptions.isVisible(k);
+                } else {
+                  newDisplayOptions[k] = !diagramOptions.isVisible(k);
+                }
+              });
+              setDiagramOptions(createDiagramOptions(newDisplayOptions)); 
+              forceUpdate();
+            }}
+          />
+          Show {PluralDisplayLabelsMap.get(t)}
+        </Styled.Label>
+      ))
     }
-  }, [sdl, options]);
-
+    </Styled.Float>
+    : null;
   return (
-    currentModel.engine ? 
+    <DiagramContext.Provider value={diagramOptions}>
+    {
+      engine ? (
       <>
         <Canvas
-          engine={currentModel.engine}
-          columns={currentModel.nodeCount ?? 4}
+          engine={engine}
+          columns={nodeCount ?? 4}
           nodeWidth={150}
-          rows={currentModel.nodeCount ?? 4}
+          rows={nodeCount ?? 4}
           nodeHeight={150}
         />
-      
-      {!showOptions ? null : (
-        <Styled.Float>
-          <Styled.Label>
-            <Styled.Checkbox
-              id="meta-links"
-              type="checkbox"
-              color="primary"
-              checked={options.showMetaLinks}
-              onChange={() =>
-                setOptions({
-                  showMetaLinks: !options.showMetaLinks,
-                  showInheritanceLinks: options.showInheritanceLinks,
-                  showInputObjectTypes: options.showInputObjectTypes,
-                })
-              }
-            />
-            Show Meta Links
-          </Styled.Label>
-          <Styled.Label>
-            <Styled.Checkbox
-              id="inheritance"
-              type="checkbox"
-              color="primary"
-              checked={options.showInheritanceLinks}
-              onChange={() =>
-                setOptions({
-                  showMetaLinks: options.showMetaLinks,
-                  showInheritanceLinks: !options.showInheritanceLinks,
-                  showInputObjectTypes: options.showInputObjectTypes,
-                })
-              }
-            />
-            Show Inheritance
-          </Styled.Label>
-          <Styled.Label>
-            <Styled.Checkbox
-              id="input-object-types"
-              type="checkbox"
-              color="primary"
-              checked={options.showInputObjectTypes}
-              onChange={() =>
-                setOptions({
-                  showMetaLinks: options.showMetaLinks,
-                  showInheritanceLinks: options.showInheritanceLinks,
-                  showInputObjectTypes: !options.showInputObjectTypes,
-                })
-              }
-            />
-            Show Input Object Types
-          </Styled.Label>
-        </Styled.Float>
-      )}
-    </> 
-   : null);
+        {options}
+      </>
+    ) : null}
+    </DiagramContext.Provider>
+  );
 }

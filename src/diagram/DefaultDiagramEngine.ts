@@ -18,6 +18,7 @@ import {ListItemModel, ListItemModelGenerics} from './list/ListItemModel';
 import { ListNodeFactory } from './node/ListNodeFactory';
 import { LeftAndRightListItemFactory, SimpleTextListItemFactory } from './list/ItemFactory';
 import { DefaultDiagramState } from './states/DefaultDiagramState';
+import { HideableLinkFactory } from './link/HideableLinkFactory';
 
 export class DefaultDiagramEngine extends DiagramEngine {
   protected itemFactories: FactoryBank<
@@ -47,6 +48,7 @@ export class DefaultDiagramEngine extends DiagramEngine {
     this.getNodeFactories().registerFactory(new DefaultNodeFactory()); // i cant figure out why
     this.getLinkFactories().registerFactory(new DefaultLinkFactory());
     this.getLinkFactories().registerFactory(new PathFindingLinkFactory());
+    this.getLinkFactories().registerFactory(new HideableLinkFactory());
     this.getPortFactories().registerFactory(new DefaultPortFactory());
 
     // register the default interaction behaviours

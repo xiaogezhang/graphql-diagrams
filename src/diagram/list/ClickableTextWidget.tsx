@@ -1,10 +1,11 @@
 import * as React from 'react';
-import _map from 'lodash/map';
 import styled from '@emotion/styled';
 import tinycolor from 'tinycolor2';
 import {ClickableText, TargetType} from './ClickableText';
 import CanvasContext from '../graphql/CanvasContext';
 import { getTextColor } from '../utils/color';
+import { ListNodeModel } from '../node/ListNodeModel';
+import DiagramContext from '../DiagramContext';
 
 namespace Styled {
   export const Text = styled.div<{color?: string}>`
@@ -49,6 +50,7 @@ export function ClickableTextWidget(props: ClickableTextProps) {
   const color = content?.color;
   const backgroundColor = content?.backgroundColor;
   const colorToUse = getTextColor(!!target, color, backgroundColor);
+  const {isVisible} = React.useContext(DiagramContext);
   const canvas = React.useContext(CanvasContext);
   if (!label || !target) {
     return <Styled.Text color={colorToUse}>{label}</Styled.Text>;
@@ -66,6 +68,12 @@ export function ClickableTextWidget(props: ClickableTextProps) {
           // scrollToElement(target.value);            
           const targetNode = canvas?.canvasModel.getNode(target.value);
           if (targetNode) {
+            if (targetNode instanceof ListNodeModel) {
+              // target node is not visible
+              if (!targetNode.isVisible(isVisible)){
+                return;
+              }
+            }
             targetNode.setSelected();
             const x = targetNode.getX();
             const y = targetNode.getY();

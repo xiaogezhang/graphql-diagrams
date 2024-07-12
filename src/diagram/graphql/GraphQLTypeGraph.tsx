@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
   GraphQLEnumType,
   GraphQLError,
@@ -15,8 +16,8 @@ import {
 } from 'graphql';
 import {
   DiagramModel,
-  DefaultLinkModel,
   DefaultPortModel,
+  DiagramEngine,
 } from '@projectstorm/react-diagrams';
 
 import tinycolor from 'tinycolor2';
@@ -28,9 +29,13 @@ import {
 } from '../list/LeftAndRightListItem';
 import {typeDisplayName} from './GraphQLTypeUtils';
 import {TargetType} from '../list/ClickableText';
-import {TypeGraphOptions} from './GraphQLDiagramContext';
 import {TreeNode, layout} from '../layout';
 import { MultiLineText, MultiLineTextListItemType } from '../list/MultiLineTextListItem';
+import {HideableLinkModel} from '../link/HideableLinkModel';
+import { HideableLinkFactory } from '../link/HideableLinkFactory';
+import { DefaultDiagramEngine } from '../DefaultDiagramEngine';
+import { sdlToSchema } from './sdlToSchema';
+import { GraphQLDiagramElementType } from './GraphQLNodeTypes';
 
 const ErrorNodeColor: string = 'Crimson';
 const TypeNodeColor: string = 'rgb(248, 248, 235)';
@@ -50,6 +55,28 @@ const metaTypeLinkColor = 'Turquoise';
 const unionTypeLinkColor = 'SpringGreen';
 
 const EnumValuesLimit = 20;
+
+function getElementType(
+  type:
+    | GraphQLObjectType
+    | GraphQLInterfaceType
+    | GraphQLInputObjectType
+    | GraphQLUnionType
+    | GraphQLEnumType,
+): GraphQLDiagramElementType {
+  if (type instanceof GraphQLObjectType) {
+    return GraphQLDiagramElementType.OBJECT_TYPE;
+  } else if (type instanceof GraphQLInterfaceType) {
+    return GraphQLDiagramElementType.INTERFACE; 
+  } else if (type instanceof GraphQLInputObjectType) {
+    return GraphQLDiagramElementType.INPUT_OBJECT_TYPE;
+  } else if (type instanceof GraphQLUnionType) {
+    return GraphQLDiagramElementType.UNION_TYPE;
+  } else if (type instanceof GraphQLEnumType) {
+    return GraphQLDiagramElementType.ENUM_TYPE;
+  }
+  return GraphQLDiagramElementType.UNKNOWN;
+}
 
 function createTypeNode(
   diagramModel: DiagramModel,
@@ -71,6 +98,7 @@ function createTypeNode(
     name: type.name,
     color: nodeColor,
   });
+  typeNode.elementType = getElementType(type); 
   diagramModel.addNode(typeNode);
   nodesMap.set(type.name, typeNode);
   const inPort = typeNode.addInPort('class in ' + type.name);
@@ -86,7 +114,7 @@ function createTypeNode(
     children: [],
   };
 
-  hydrateTypeNode(diagramModel, type, typeTreeNode, nodesMap);
+  hydrateTypeNode(diagramModel, type, typeTreeNode, nodesMap, );
   return typeTreeNode;
 }
 
@@ -124,7 +152,8 @@ function hydrateUnionType(
     if (memberNode) {
       const memberInPort = memberNode.getInPort();
       if (memberInPort) {
-        const memberLink = memberRowPort.link<DefaultLinkModel>(memberInPort);
+        const memberLink = memberRowPort.link<HideableLinkModel>(memberInPort, new HideableLinkFactory());
+        memberLink.elementType = GraphQLDiagramElementType.TYPE_REFERENCE_LINK;
         memberLink.setWidth(2);
         memberLink.setColor(unionTypeLinkColor);
         memberLink.setLocked(true);
@@ -183,11 +212,11 @@ function hydrateTypeNode(
   nodesMap: Map<string, ListNodeModel>,
 ): void {
   if (isUnionType(type)) {
-    hydrateUnionType(diagramModel, type, typeTreeNode, nodesMap);
+    hydrateUnionType(diagramModel, type, typeTreeNode, nodesMap, );
     return;
   }
   if (isEnumType(type)) {
-    hydrateEnumType(diagramModel, type, typeTreeNode, nodesMap);
+    hydrateEnumType(diagramModel, type, typeTreeNode, nodesMap, );
     return;
   }
   const fields = Object.values(type.getFields());
@@ -251,7 +280,11 @@ function hydrateTypeNode(
         rowOutPort.setLocked(true);
         const fieldTypeInPort = fieldTypeNode.getInPort();
         if (fieldTypeInPort) {
-          const fieldLink = rowOutPort.link<DefaultLinkModel>(fieldTypeInPort);
+          const fieldLink = rowOutPort.link<HideableLinkModel>(
+            fieldTypeInPort,
+            new HideableLinkFactory(),
+          );
+          fieldLink.elementType = GraphQLDiagramElementType.FIELD_TYPE_LINK;
           fieldLink.setWidth(2);
           fieldLink.setColor(fieldTypeLinkColor);
           fieldLink.setLocked(true);
@@ -287,7 +320,11 @@ function addImplementsLinks(
           const interfaceNode = nodesMap.get(inter.name);
           if (interfaceNode) {
             const outPort = interfaceNode.getOutPort() as DefaultPortModel;
-            const implementationLink = outPort.link<DefaultLinkModel>(inPort);
+            const implementationLink = outPort.link<HideableLinkModel>(
+              inPort,
+              new HideableLinkFactory(),
+            );
+            implementationLink.elementType = GraphQLDiagramElementType.INHERITANCE_LINK;
             implementationLink.setWidth(2);
             implementationLink.setColor(implementationLinkColor);
             implementationLink.setLocked(true);
@@ -297,6 +334,28 @@ function addImplementsLinks(
       }
     }
   }
+}
+
+export function useGraphQLTypeGraph(sdl?: string) { 
+  const [graph, setGraph] = React.useState<{
+    engine?: DiagramEngine, 
+    nodeCount?: number,
+  }>({})
+  React.useEffect(() => {
+    if (sdl) {
+      const engine = new DefaultDiagramEngine();
+      const {schema, errors} = sdlToSchema(sdl);
+      const model = createTypeGraph(errors, schema);
+      const nodeCount = (Object.values(schema?.getTypeMap() ?? {}).length ?? 10) + (errors ? (errors.length + 4)  : 10);
+      if (model) {
+        engine.setModel(model);
+      }
+      setGraph(_ => ({engine: engine, nodeCount: nodeCount}));  
+    } else {
+      setGraph(_ => ({nodeCount: 0}));
+    }  
+  }, [sdl]);
+  return graph;
 }
 
 /**
@@ -315,7 +374,6 @@ function addImplementsLinks(
 export function createTypeGraph(
   errors: ReadonlyArray<GraphQLError>,
   schema?: GraphQLSchema,
-  options?: TypeGraphOptions,
 ): DiagramModel {
   const diagramModel = new DiagramModel();
 
@@ -326,6 +384,7 @@ export function createTypeGraph(
       name: 'Errors',
       color: ErrorNodeColor,
     });
+    errorsNode.elementType = GraphQLDiagramElementType.ERROR;
     diagramModel.addNode(errorsNode);
     let width = 6;
     errors.forEach((error) => {
@@ -361,16 +420,13 @@ export function createTypeGraph(
   }
   const schemaConfig = schema.toConfig();
 
-  const showMetaLinks = options?.showMetaLinks ?? false;
-  const showInheritanceLinks = options?.showInheritanceLinks ?? false;
-  const showInputObjectTypes = options?.showInputObjectTypes ?? false;
-
   const nodesMap = new Map<string, ListNodeModel>();
 
   const schemaNode = new ListNodeModel({
     name: 'Schema',
     color: 'Azure',
   });
+  schemaNode.elementType = GraphQLDiagramElementType.SCHEMA;
   schemaNode.width = 18 * charWidth;
   diagramModel.addNode(schemaNode);
   const schemaOutTargetNodes: Array<ListNodeModel> = [];
@@ -384,10 +440,8 @@ export function createTypeGraph(
     {name: 'Union Types', color: 'SlateGrey'},
     {name: 'Interfaces', color: 'LightGoldenRodYellow'},
     {name: 'Subscriptions', color: 'PaleGreen'},
+    {name: 'Input Object Types', color: 'LightCyan'},
   ];
-  if (showInputObjectTypes) {
-    schemaRows.push({name: 'Input Object Types', color: 'LightCyan'});
-  }
   const schemaTreeNode: TreeNode = {
     node: schemaNode,
     rowsCount: schemaRows.length,
@@ -401,6 +455,7 @@ export function createTypeGraph(
       name: name,
       color: color,
     });
+    nodeForRow.elementType = GraphQLDiagramElementType.META;
     diagramModel.addNode(nodeForRow);
     const inPort = nodeForRow.addInPort('Schema');
     nodeForRow.setInPort(inPort);
@@ -415,7 +470,11 @@ export function createTypeGraph(
       target: {type: 'node', value: nodeForRow.getID()},
     });
     schemaOutTargetNodes.push(nodeForRow);
-    const linkFromSchema = outPort.link<DefaultLinkModel>(inPort);
+    const linkFromSchema = outPort.link<HideableLinkModel>(
+      inPort,
+      new HideableLinkFactory(),
+    );
+    linkFromSchema.elementType = GraphQLDiagramElementType.SCHEMA_LINK;
     linkFromSchema.setWidth(2);
     linkFromSchema.setColor(schemaMetaLinkColor);
     linkFromSchema.setLocked(true);
@@ -433,7 +492,7 @@ export function createTypeGraph(
   const unionTypesNode = schemaOutTargetNodes[6];
   const interfacesNode = schemaOutTargetNodes[7];
   const subscriptionsNode = schemaOutTargetNodes[8];
-  const inputObjectTypesNode = showInputObjectTypes ? schemaOutTargetNodes[9] : null;
+  const inputObjectTypesNode = schemaOutTargetNodes[9];
 
   const directives = schemaConfig.directives;
   directives.forEach((directive) => {
@@ -507,15 +566,13 @@ export function createTypeGraph(
     children: [],
   };
   schemaTreeNode.children.push(subscriptionsTreeNode);
-  const inputObjectTypesTreeNode: TreeNode | null = showInputObjectTypes && inputObjectTypesNode ? {
+  const inputObjectTypesTreeNode: TreeNode = {
     node: inputObjectTypesNode,
     rowsCount: 0,
     width: schemaRows[9].name.length,
     children: [],
-  } : null;
-  if (inputObjectTypesTreeNode) {
-    schemaTreeNode.children.push(inputObjectTypesTreeNode);
-  }
+  };
+  schemaTreeNode.children.push(inputObjectTypesTreeNode);
 
   const types = schemaConfig.types;
   const queryType = schemaConfig.query;
@@ -545,7 +602,6 @@ export function createTypeGraph(
           type,
           nodesMap,
           TypeNodeColor,
-          showMetaLinks,
         );
       } else if (isEnumType(type)) {
         createTypeRowAndNode(
@@ -554,17 +610,15 @@ export function createTypeGraph(
           type,
           nodesMap,
           EnumColor,
-          showMetaLinks,
         );
       } else if (isInputObjectType(type)) {
-        if (showInputObjectTypes && inputObjectTypesTreeNode) {
+        if (inputObjectTypesTreeNode) {
           createTypeRowAndNode(
             diagramModel,
             inputObjectTypesTreeNode,
             type,
             nodesMap,
             InputObjectTypeColor,
-            showMetaLinks,
           );
         }
       } else if (isUnionType(type)) {
@@ -574,7 +628,6 @@ export function createTypeGraph(
           type,
           nodesMap,
           UnionTypeColor,
-          showMetaLinks,
         );
       } else if (isInterfaceType(type)) {
         createTypeRowAndNode(
@@ -583,16 +636,15 @@ export function createTypeGraph(
           type,
           nodesMap,
           InterfaceNodeColor,
-          showMetaLinks,
         );
       }
     }
   });
   if (queryType) {
-    hydrateTypeNode(diagramModel, queryType, queryTreeNode, nodesMap);
+    hydrateTypeNode(diagramModel, queryType, queryTreeNode, nodesMap, );
   }
   if (mutationType) {
-    hydrateTypeNode(diagramModel, mutationType, mutationTreeNode, nodesMap);
+    hydrateTypeNode(diagramModel, mutationType, mutationTreeNode, nodesMap, );
   }
 
   if (subscriptionType) {
@@ -603,9 +655,7 @@ export function createTypeGraph(
       nodesMap,
     );
   }
-  if (showInheritanceLinks) {
-    addImplementsLinks(schema, nodesMap, diagramModel);
-  }
+  addImplementsLinks(schema, nodesMap, diagramModel, );
 
   layout(roots, startX, startY);
 
@@ -623,7 +673,6 @@ function createTypeRowAndNode(
     | GraphQLEnumType,
   nodesMap: Map<string, ListNodeModel>,
   typeNodeColor: string,
-  showMetaLinks: boolean,
 ): void {
   const typesNode = typesTreeNode.node;
   const typeRow = typesNode.createItem(SimpleTextListItemType);
@@ -649,8 +698,12 @@ function createTypeRowAndNode(
   }
   if (typeNode) {
     const typeInPort = typeNode.getInPort();
-    if (showMetaLinks && typeInPort) {
-      const typeLink = typeRowPort.link<DefaultLinkModel>(typeInPort);
+    if (typeInPort) {
+      const typeLink = typeRowPort.link<HideableLinkModel>(
+        typeInPort,
+        new HideableLinkFactory(),
+      );
+      typeLink.elementType = GraphQLDiagramElementType.META_LINK;
       typeLink.setWidth(2);
       typeLink.setColor(metaTypeLinkColor);
       typeLink.setLocked(true);

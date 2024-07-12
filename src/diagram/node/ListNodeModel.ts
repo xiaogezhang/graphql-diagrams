@@ -12,6 +12,8 @@ import {
 import {ListItemModel} from '../list/ListItemModel';
 import {WithInOutPorts} from '../port/WithInOutPorts';
 import {createListItem} from '../list/ItemFactory';
+import { Hideable } from '../core/Hideable';
+import { DiagramElement } from '../core/DiagramElement';
 
 export interface ListNodeModelOptions extends DefaultNodeModelOptions {
   name?: string;
@@ -24,13 +26,18 @@ export interface ListNodeModelGenerics extends DefaultNodeModelGenerics {
 
 export const ListNodeModelType: string = 'ListNodeModel';
 
-export class ListNodeModel extends DefaultNodeModel implements WithInOutPorts {
+export class ListNodeModel
+  extends DefaultNodeModel
+  implements WithInOutPorts, Hideable, DiagramElement
+{
+  elementType: string = 'UNKNOWN';
   protected inPortEnabled: boolean = false;
   protected outPortEnabled: boolean = false;
   protected inPort?: PortModel;
   protected outPort?: PortModel;
   protected items: ListItemModel<any>[];
   protected header?: ListItemModel<any>;
+  protected isHidden?: boolean;
 
   constructor(name: string, color: string);
   constructor(options?: ListNodeModelOptions);
@@ -50,11 +57,11 @@ export class ListNodeModel extends DefaultNodeModel implements WithInOutPorts {
     this.items = [];
   }
 
-  /** 
-   * Port is where a link can connect to. A node can own many ports. 
-   * 
+  /**
+   * Port is where a link can connect to. A node can own many ports.
+   *
    * Remove the port if it belongs to this node.
-  **/ 
+   **/
   removePort(port: DefaultPortModel): void {
     const items = this.getItems();
     items.forEach((item) => {
@@ -162,7 +169,9 @@ export class ListNodeModel extends DefaultNodeModel implements WithInOutPorts {
     super.doClone(lookupTable, clone);
     clone.inPortEnabled = this.inPortEnabled;
     clone.outPortEnabled = this.outPortEnabled;
-    clone.header = this.header?.clone(lookupTable); 
+    clone.header = this.header?.clone(lookupTable);
+    clone.isHidden = this.isHidden;
+    clone.elementType = this.elementType;
     clone.items = [];
 
     _forEach(this.items, (item) => {
@@ -184,21 +193,23 @@ export class ListNodeModel extends DefaultNodeModel implements WithInOutPorts {
     if (headerData) {
       this.header = createListItem(headerData.type);
       const headerEvent: DeserializeEvent<ListItemModel<any>> = {
-         engine: event.engine,
-         registerModel: event.registerModel,
-         getModel: event.getModel,
-         data: headerData,
+        engine: event.engine,
+        registerModel: event.registerModel,
+        getModel: event.getModel,
+        data: headerData,
       };
       this.header.deserialize(headerEvent);
     }
-    
+    this.isHidden = event.data.isHidden;
+    this.elementType = event.data.elementType;
+
     _forEach(event.data.items, (item: any) => {
       let newItem = createListItem(item.type);
       const itemEvent: DeserializeEvent<ListItemModel<any>> = {
-         engine: event.engine,
-         registerModel: event.registerModel,
-         getModel: event.getModel,
-         data: item,
+        engine: event.engine,
+        registerModel: event.registerModel,
+        getModel: event.getModel,
+        data: item,
       };
       newItem.deserialize(itemEvent);
       this.addItem(newItem);
@@ -213,9 +224,26 @@ export class ListNodeModel extends DefaultNodeModel implements WithInOutPorts {
       inPortID: this.inPort?.getID(),
       outPortID: this.outPort?.getID(),
       header: this.header?.serialize(),
+      isHidden: this.isHidden,
+      elementType: this.elementType,
       items: _map(this.items, (item) => {
         return item.serialize();
       }),
     };
+  }
+
+  hide(): void {
+    this.isHidden = true;
+  }
+
+  show(): void {
+    this.isHidden = false;
+  }
+
+  isVisible(isTypeVisible: (elementType: string) => boolean): boolean {
+    if (!isTypeVisible(this.elementType)) {
+      return false;
+    }
+    return !this.isHidden;
   }
 }

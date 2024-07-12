@@ -39,6 +39,7 @@ export function CanvasWidget(props: DiagramProps) {
     const canvasListener = engine.registerListener({
       repaintCanvas: () => {
         if (ref.current) {
+          engine.setCanvas(ref.current);
           forceUpdate();
         }
       },
