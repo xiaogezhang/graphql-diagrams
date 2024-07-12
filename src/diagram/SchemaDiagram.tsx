@@ -30,6 +30,9 @@ namespace Styled {
 
   export const Label = styled.label`
     padding: 12px;
+    display: flex;
+    flex-direction: row;
+    white-space: nowrap;
   `;
 }
 
