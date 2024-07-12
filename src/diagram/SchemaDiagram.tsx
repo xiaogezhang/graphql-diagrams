@@ -1,14 +1,12 @@
-import React, {useContext, useState} from 'react';
+import React from 'react';
 
 import {useGraphQLTypeGraph} from './graphql/GraphQLTypeGraph';
 import Canvas from './Canvas';
 import styled from '@emotion/styled';
 import DiagramContext, {DiagramOptions, HiddenDisplayOptions, createDiagramOptions} from './DiagramContext';
 import {
-  GraphQLDiagramElementType,
   PluralDisplayLabelsMap,
 } from './graphql/GraphQLNodeTypes';
-import { DiagramEngine } from '@projectstorm/react-diagrams';
 
 namespace Styled {
   export const Float = styled.div`
@@ -41,11 +39,10 @@ export default function SchemaDiagram(props: {
   displayOptions?: HiddenDisplayOptions;
 }) {
   const {sdl, displayOptions} = props;
-  const [diagramOptions, setDiagramOptions] = useState<DiagramOptions>(
+  const [diagramOptions, setDiagramOptions] = React.useState<DiagramOptions>(
     createDiagramOptions(displayOptions),
   );
   const {engine, nodeCount} = useGraphQLTypeGraph(sdl);
-  const [, forceUpdate] = React.useReducer((x) => x + 1, 0);
   const optionKeys = displayOptions ? Object.keys(displayOptions) : null;
   const options = optionKeys && optionKeys.length > 0? 
     <Styled.Float>
@@ -67,7 +64,6 @@ export default function SchemaDiagram(props: {
                 }
               });
               setDiagramOptions(createDiagramOptions(newDisplayOptions)); 
-              forceUpdate();
             }}
           />
           Show {PluralDisplayLabelsMap.get(t)}
