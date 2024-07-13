@@ -41,7 +41,27 @@ namespace Styled {
     &:hover {
       cursor: pointer;
       background-color: Lime;
+      span { visibility: visible; }
     }
+  `;
+
+  export const Tooltip = styled.span`
+    visibility: hidden;
+    background-color: white;
+    color: #333;
+    text-align: center;
+    border-radius: 5px;
+    padding: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 14px;
+    box-shadow: 2px 2px 1px silver;
+
+    /* Position the tooltip */
+    position: absolute;
+    margin-top: 40px;
+    margin-left: -20px;
+    z-index: 100;
   `;
 
   export const Header = styled.div`
@@ -71,14 +91,23 @@ export type ExpandableContainerProps = {
 export default function ExpandableContainer(props: React.PropsWithChildren<ExpandableContainerProps>) {
   const {backgroundColor, header, collapseOnClickOutside, startAsExpanded, expandedOpacity, expandedPosition, expandedHeight, expandedWidth} = props;
   const [expanded, setExpanded] = useState<boolean>(startAsExpanded ?? false);
-  const headerComponent = <Styled.Header>
+  const headerComponent = (
+    <Styled.Header>
       {expanded ? (
-        <Styled.Button onClick={() => setExpanded(!expanded)}>&#9196;</Styled.Button>
-        ) : (
-        <Styled.Button onClick={() => setExpanded(!expanded)}>&#9195;</Styled.Button>
+        <Styled.Button onClick={() => setExpanded(!expanded)}>
+          &#9196;
+          <Styled.Tooltip>Collapse</Styled.Tooltip>
+        </Styled.Button>
+      ) : (
+        <Styled.Button
+          onClick={() => setExpanded(!expanded)}>
+          &#9195;
+          <Styled.Tooltip>Expand</Styled.Tooltip>
+        </Styled.Button>
       )}
       {header}
-    </Styled.Header>;
+    </Styled.Header>
+  );
 
   return <OutsideClickObserver
       onClickOutside={(outside: boolean) => outside && setExpanded(!collapseOnClickOutside) }>
