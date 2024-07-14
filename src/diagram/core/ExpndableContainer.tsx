@@ -36,7 +36,6 @@ namespace Styled {
     font-size: 24px;
     width: max-content;
     padding: 4px;
-    margin-right: 8px;
     border-radius: 4px;
     &:hover {
       cursor: pointer;
@@ -70,10 +69,6 @@ namespace Styled {
     display: flex;
     flex-direction: row;
     align-items: center;
-  `;
-
-  export const Link = styled.div`
-    padding-left: 24px;
   `;
 }
 
