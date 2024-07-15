@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from '@emotion/styled';
 import tinycolor from 'tinycolor2';
 import {ClickableText, TargetType} from './ClickableText';
-import CanvasContext from '../graphql/CanvasContext';
+import CanvasContext from '../CanvasContext';
 import { getTextColor } from '../utils/color';
 import { ListNodeModel } from '../node/ListNodeModel';
 import DiagramContext from '../DiagramContext';

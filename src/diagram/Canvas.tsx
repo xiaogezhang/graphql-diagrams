@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import {
   DiagramEngine,
 } from '@projectstorm/react-diagrams';
-import CanvasContext from './graphql/CanvasContext';
+import CanvasContext from './CanvasContext';
 import { CanvasWidget } from './CanvasWidget';
 
 namespace Styled {

@@ -1,4 +1,4 @@
-import CanvasContext from './diagram/graphql/CanvasContext';
+import CanvasContext from './diagram/CanvasContext';
 import SchemaDiagram from './diagram/SchemaDiagram';
 import OutsideClickObserver from './diagram/core/hooks';
 import ExpandableContainer from './diagram/core/ExpndableContainer';
