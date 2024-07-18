@@ -49,9 +49,9 @@ export default function SchemaDiagram(props: {
     const context = createDiagramContext(displayOptions, {click: click}, engine);
     setDiagramOptions(_ => context);
   }, [displayOptions, engine]);
-  return <DiagramContext.Provider value={diagramOptions}>
+  return diagramOptions && nodeCount ? <DiagramContext.Provider value={diagramOptions}>
     <SchemaDiagramIntern nodeCount={nodeCount} changeDiagramContext={setDiagramOptions}/>
-  </DiagramContext.Provider>
+  </DiagramContext.Provider> : null;
 }
 
 function SchemaDiagramIntern(props: {

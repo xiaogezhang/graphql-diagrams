@@ -47,7 +47,7 @@ export function click(context: DiagramContextType, target?: ClickableTarget) {
     // so choose different approach
     // scrollToElement(target.value);
     const model = engine?.getModel();
-    if (model) {
+    if (model && engine) {
       const targetNode = model.getNode(target.value);
       if (targetNode) {
         if (targetNode instanceof ListNodeModel) {
