@@ -86,7 +86,10 @@ export function toggleDisplayOption(
 }
 
 /**
- * Context for schema diagram to use within the canvas. Such as display options etc.
+ * Context for schema diagram to use within the canvas. Includes:
+ * 1. display options: the types of diagram elements to show/hide
+ * 2. action options: the actions for different type of targets
+ * 3. engine: the engine for the diagram, which contains the model.
  */
 const DiagramContext = createContext<DiagramContextType>(createDiagramContext());
 

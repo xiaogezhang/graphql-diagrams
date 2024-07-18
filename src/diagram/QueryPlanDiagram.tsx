@@ -2,7 +2,9 @@ import React, {useEffect, useState} from 'react';
 
 import Canvas from './Canvas';
 import {createQueryPlanGraph} from './graphql/queryPlan/QueryPlanGraph';
-import { DefaultDiagramEngine } from './DefaultDiagramEngine';
+import {DefaultDiagramEngine} from './DefaultDiagramEngine';
+
+const MIN_NODE_COUNT: number = 50;
 
 export default function QueryPlanDiagram(props: {
   queryPlan?: string;
@@ -12,37 +14,44 @@ export default function QueryPlanDiagram(props: {
   const [currentModel, setCurrentModel] = useState<{
     engine?: DefaultDiagramEngine;
     nodeCount?: number;
-    error?: Error,
+    error?: Error;
   }>({});
   useEffect(() => {
     try {
       const engine = new DefaultDiagramEngine();
-      const model = queryPlan ? createQueryPlanGraph(queryPlan, queryStr) : null;
+      const model = queryPlan
+        ? createQueryPlanGraph(queryPlan, queryStr)
+        : null;
       if (model) {
         engine.setModel(model);
       }
       const nodes = model?.getNodes();
-      const nodeCount = (nodes?.length ?? 0) / 4 < 50 ? 50 : (nodes?.length ?? 0) / 4; 
-      setCurrentModel(_ => ({
+      const nodeCount =
+        (nodes?.length ?? 0) / 4 < MIN_NODE_COUNT
+          ? MIN_NODE_COUNT
+          : (nodes?.length ?? 0) / 4;
+      setCurrentModel((_) => ({
         engine: engine,
         nodeCount: nodeCount,
       }));
     } catch (e) {
-      setCurrentModel(_ => ({
-        error: e instanceof Error? e : undefined,
+      setCurrentModel((_) => ({
+        error: e instanceof Error ? e : undefined,
       }));
     }
   }, [queryPlan, queryStr]);
 
   return currentModel.engine ? (
-      <Canvas
-        engine={currentModel.engine}
-        columns={currentModel.nodeCount}
-        nodeWidth={150}
-        rows={currentModel.nodeCount}
-        nodeHeight={150}
-      />
-    ) : ( 
-      currentModel.error? <div color="red">{currentModel.error.message}</div>: <div color="green">loading</div> 
-    );
+    <Canvas
+      engine={currentModel.engine}
+      columns={currentModel.nodeCount}
+      nodeWidth={150}
+      rows={currentModel.nodeCount}
+      nodeHeight={150}
+    />
+  ) : currentModel.error ? (
+    <div color="red">{currentModel.error.message}</div>
+  ) : (
+    <div color="green">loading</div>
+  );
 }

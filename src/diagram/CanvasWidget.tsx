@@ -11,7 +11,7 @@ export interface DiagramProps {
   className?: string;
 }
 
-namespace S {
+namespace Styled {
   export const Canvas = styled.div`
     position: relative;
     cursor: move;
@@ -26,12 +26,10 @@ export function CanvasWidget(props: DiagramProps) {
   const model = engine.getModel();
   // @ts-ignore
   const keyDown = React.useCallback((event) => {
-    //engine.setCanvas(ref.current);
     engine.getActionEventBus().fireAction({event});
   }, [engine]);
   // @ts-ignore
   const keyUp = React.useCallback((event) => {
-    //engine.setCanvas(ref.current);
     engine.getActionEventBus().fireAction({event});
   }, [engine]);
 
@@ -64,7 +62,7 @@ export function CanvasWidget(props: DiagramProps) {
   }, [engine, keyDown, keyUp]);
 
   return (
-    <S.Canvas
+    <Styled.Canvas
       className={className}
       ref={ref}
       onWheel={(event) => { 
@@ -99,6 +97,6 @@ export function CanvasWidget(props: DiagramProps) {
           </TransformLayerWidget>
         );
       })}
-    </S.Canvas>
+    </Styled.Canvas>
   );
 }

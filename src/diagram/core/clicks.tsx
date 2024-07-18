@@ -4,11 +4,10 @@ import {ListNodeModel} from '../node/ListNodeModel';
 import {DiagramContextType} from '../DiagramContext';
 
 function scrollCanvas(engine: DiagramEngine, x: number, y: number): void {
-  // below doesn't work, as the canvas model maintains offsetX and offsetY
+  // browser API to scroll element doesn't work, as the canvas model maintains 
+  // offsetX and offsetY. 
   // htmlElem.scrollIntoView(..) or other scroll method don't update
   // canvas offsets, and will cause wrong position for all nodes and links.
-  //const canvasElem = engine.getCanvas();
-  //canvasElem?.scrollBy(x, y);
   const model = engine.getModel();
   if (!model) {
     return;
