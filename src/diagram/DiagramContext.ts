@@ -17,7 +17,6 @@ export type ActionOptions = {
 
 export type DiagramContextType = ActionOptions & DisplayOptions & {
   engine?: DiagramEngine;
-  start: number;
 };
 
 export function createDiagramContext(
@@ -32,13 +31,11 @@ export function createDiagramContext(
   const actions: ActionOptions = actionOptions || {
     click: (_c: DiagramContextType, _t: ClickableTarget) => void {},
   };
-  const start = Date.now();
   return {
     hiddenDisplayOptions: elementVisibilities,
     isVisible: isVisible,
     ...actions,
     engine: engine,
-    start: start,
   };
 }
 
@@ -49,11 +46,9 @@ export function setDisplayOption(
 ): DiagramContextType {
   const {hiddenDisplayOptions} = context;
   hiddenDisplayOptions[option] = hidden;
-  const start = Date.now();
   return {
     ...context,
     hiddenDisplayOptions: hiddenDisplayOptions,
-    start: start,
   };
 }
 
@@ -77,11 +72,9 @@ export function toggleDisplayOption(
 ): DiagramContextType {
   const {hiddenDisplayOptions} = context;
   hiddenDisplayOptions[option] = !hiddenDisplayOptions[option];
-  const start = Date.now();
   return {
     ...context,
     hiddenDisplayOptions: hiddenDisplayOptions,
-    start: start,
   };
 }
 
