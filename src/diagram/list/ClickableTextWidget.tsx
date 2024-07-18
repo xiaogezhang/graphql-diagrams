@@ -1,10 +1,8 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
 import tinycolor from 'tinycolor2';
-import {ClickableText, TargetType} from './ClickableText';
-import CanvasContext from '../CanvasContext';
-import { getTextColor } from '../utils/color';
-import { ListNodeModel } from '../node/ListNodeModel';
+import {ClickableText} from './ClickableText';
+import {getTextColor} from '../utils/color';
 import DiagramContext from '../DiagramContext';
 
 namespace Styled {
@@ -50,8 +48,7 @@ export function ClickableTextWidget(props: ClickableTextProps) {
   const color = content?.color;
   const backgroundColor = content?.backgroundColor;
   const colorToUse = getTextColor(!!target, color, backgroundColor);
-  const {isVisible} = React.useContext(DiagramContext);
-  const canvas = React.useContext(CanvasContext);
+  const context = React.useContext(DiagramContext);
   if (!label || !target) {
     return <Styled.Text color={colorToUse}>{label}</Styled.Text>;
   }
@@ -62,26 +59,7 @@ export function ClickableTextWidget(props: ClickableTextProps) {
         if (onClick) {
           onClick();
         }
-        if (target.type === TargetType.NODE) {
-          // The following scrollToElement() method is messing up the internal offset of the canvas, 
-          // so choose different approach
-          // scrollToElement(target.value);            
-          const targetNode = canvas?.canvasModel.getNode(target.value);
-          if (targetNode) {
-            if (targetNode instanceof ListNodeModel) {
-              // target node is not visible
-              if (!targetNode.isVisible(isVisible)){
-                return;
-              }
-            }
-            targetNode.setSelected();
-            const x = targetNode.getX();
-            const y = targetNode.getY();
-            if (canvas) {
-              canvas?.scrollCanvas(x, y);
-            }
-          }
-        }
+        context.click(context, target);
       }
     : undefined;
   const tinyColor = backgroundColor ? tinycolor(backgroundColor) : null;

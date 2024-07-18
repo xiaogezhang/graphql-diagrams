@@ -1,14 +1,16 @@
-import React from 'react';
+import React, {useContext, useEffect} from 'react';
 
 import {useGraphQLTypeGraph} from './graphql/GraphQLTypeGraph';
 import Canvas from './Canvas';
 import styled from '@emotion/styled';
 import DiagramContext, {
-  DisplayOptions,
+  DiagramContextType,
   HiddenDisplayOptions,
-  createDiagramOptions,
+  createDiagramContext,
+  toggleDisplayOption,
 } from './DiagramContext';
 import {PluralDisplayLabelsMap} from './graphql/GraphQLNodeTypes';
+import {click} from './core/clicks';
 
 namespace Styled {
   export const Float = styled.div`
@@ -41,11 +43,30 @@ export default function SchemaDiagram(props: {
   displayOptions?: HiddenDisplayOptions;
 }) {
   const {sdl, displayOptions} = props;
-  const [diagramOptions, setDiagramOptions] = React.useState<DisplayOptions>(
-    createDiagramOptions(displayOptions),
-  );
   const {engine, nodeCount} = useGraphQLTypeGraph(sdl);
-  const optionKeys = displayOptions ? Object.keys(displayOptions) : null;
+  const [diagramOptions, setDiagramOptions] = React.useState<DiagramContextType>();
+  useEffect(() => {
+    const context = createDiagramContext(displayOptions, {click: click}, engine);
+    setDiagramOptions(_ => context);
+  }, [displayOptions, engine]);
+  return <DiagramContext.Provider value={diagramOptions}>
+    <SchemaDiagramIntern nodeCount={nodeCount} changeDiagramContext={setDiagramOptions}/>
+  </DiagramContext.Provider>
+}
+
+function SchemaDiagramIntern(props: {
+  nodeCount: number;
+  changeDiagramContext: (context: DiagramContextType,) => void,
+}) {
+  const {nodeCount, changeDiagramContext} = props;
+  const context = useContext(DiagramContext);
+  if (context == null) {
+    return null;
+  }
+  const {engine, hiddenDisplayOptions} = context;
+  const optionKeys = hiddenDisplayOptions
+    ? Object.keys(hiddenDisplayOptions)
+    : null;
   const options =
     optionKeys && optionKeys.length > 0 ? (
       <Styled.Float>
@@ -55,17 +76,9 @@ export default function SchemaDiagram(props: {
               id={t}
               type="checkbox"
               color="primary"
-              checked={diagramOptions.isVisible(t)}
+              checked={context.isVisible(t)}
               onChange={() => {
-                const newDisplayOptions: HiddenDisplayOptions = {};
-                optionKeys.forEach((k) => {
-                  if (k === t) {
-                    newDisplayOptions[k] = diagramOptions.isVisible(k);
-                  } else {
-                    newDisplayOptions[k] = !diagramOptions.isVisible(k);
-                  }
-                });
-                setDiagramOptions(createDiagramOptions(newDisplayOptions));
+                changeDiagramContext(toggleDisplayOption(context, t));
               }}
             />
             Show {PluralDisplayLabelsMap.get(t)}
@@ -73,20 +86,16 @@ export default function SchemaDiagram(props: {
         ))}
       </Styled.Float>
     ) : null;
-  return (
-    <DiagramContext.Provider value={diagramOptions}>
-      {engine ? (
-        <>
-          <Canvas
-            engine={engine}
-            columns={nodeCount ?? 4}
-            nodeWidth={150}
-            rows={nodeCount ?? 4}
-            nodeHeight={150}
-          />
-          {options}
-        </>
-      ) : null}
-    </DiagramContext.Provider>
-  );
+  return engine ? (
+    <>
+      <Canvas
+        engine={engine}
+        columns={nodeCount ?? 4}
+        nodeWidth={150}
+        rows={nodeCount ?? 4}
+        nodeHeight={150}
+      />
+      {options}
+    </>
+  ) : null;
 }
