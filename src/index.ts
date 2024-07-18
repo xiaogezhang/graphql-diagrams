@@ -1,4 +1,3 @@
-import CanvasContext from './diagram/CanvasContext';
 import SchemaDiagram from './diagram/SchemaDiagram';
 import OutsideClickObserver from './diagram/core/hooks';
 import ExpandableContainer from './diagram/core/ExpndableContainer';
@@ -7,7 +6,21 @@ import QueryPlanDiagram from './diagram/QueryPlanDiagram';
 import Canvas from './diagram/Canvas';
 import DiagramContext from './diagram/DiagramContext';
 
-export {type HiddenDisplayOptions} from './diagram/DiagramContext';
+export { HideableLinkFactory } from './diagram/link/HideableLinkFactory';
+
+export { HideableLinkModel } from './diagram/link/HideableLinkModel';
+
+export {
+    type DisplayOptions, 
+    type DiagramContextType, 
+    type HiddenDisplayOptions, 
+    setDisplayOption, 
+    showDisplayOption, 
+    hideDisplayOption, 
+    toggleDisplayOption,
+} from './diagram/DiagramContext';
+
+export {click} from './diagram/core/clicks';
 
 export {HideableWidget} from './diagram/core/HideableWidget';
 
@@ -53,5 +66,5 @@ export {getTextColor} from './diagram/utils/color';
 
 export {type TreeNode, type LayoutConfig, layout} from './diagram/layout';
 
-export {Canvas, CanvasContext, DiagramContext, ExpandableContainer, SchemaDiagram, OutsideClickObserver, ListNodeWidget, QueryPlanDiagram} ;
+export {Canvas, DiagramContext, ExpandableContainer, SchemaDiagram, OutsideClickObserver, ListNodeWidget, QueryPlanDiagram} ;
 

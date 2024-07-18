@@ -85,8 +85,6 @@ export function toggleDisplayOption(
   };
 }
 
-//const defaultDiagramContext: DiagramContextType = createDiagramContext();
-
 /**
  * Context for schema diagram to use within the canvas. Such as display options etc.
  */
