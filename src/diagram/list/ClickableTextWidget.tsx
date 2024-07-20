@@ -42,6 +42,7 @@ export interface ClickableTextProps {
 }
 
 export function ClickableTextWidget(props: ClickableTextProps) {
+  const ref = React.useRef(null);
   const {content, onClick} = props;
   const label = content?.label;
   const target = content?.target;
@@ -53,13 +54,13 @@ export function ClickableTextWidget(props: ClickableTextProps) {
     return <Styled.Text color={colorToUse}>{label}</Styled.Text>;
   }
   const onClickEvent = target
-    ? (e: React.MouseEvent) => {
+    ? async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         if (onClick) {
           onClick();
         }
-        context.click(context, target);
+        await context.click(context, target, ref.current);
       }
     : undefined;
   const tinyColor = backgroundColor ? tinycolor(backgroundColor) : null;
@@ -69,6 +70,7 @@ export function ClickableTextWidget(props: ClickableTextProps) {
     <Styled.ClickableText
       color={colorToUse}
       hoverColor={hoverColor}
+      ref={ref}
       onClick={onClickEvent}>
       {label}
     </Styled.ClickableText>

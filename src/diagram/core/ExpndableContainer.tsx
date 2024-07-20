@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 
 import styled from '@emotion/styled';
 import OutsideClickObserver from './hooks';
+import DepthContext from '../DepthContext';
+import '../Diagram.css';
 
 namespace Styled {
   export const Container = styled.div<{
@@ -11,6 +13,7 @@ namespace Styled {
     expandedPosition?: string;
     expandedWidth?: string;
     expandedHeight?: string;
+    depth: number;
   }>`
     position: ${(p) => (p.expanded ? (p.expandedPosition ?? 'fixed') : 'inherit')};
     top: 0;
@@ -18,7 +21,6 @@ namespace Styled {
     right: 0;
     bottom: 0;
     margin: auto;
-    padding: 8px;
     opacity: ${(p) => (p.expanded ? (p.expandedOpacity ?? '0.9') : 'inherit')};
     overflow: hidden;
     background-color: ${(p) => (p.expanded ? (p.backgroundColor ?? 'rgb(225, 225, 225)') : 'inherit')};
@@ -28,12 +30,12 @@ namespace Styled {
     transition: top 1s, left 1s;
     max-width: 100%;
     max-height: 100%;
-    z-index: ${(p) => (p.expanded ? 100 : 0)}; 
+    z-index: ${(p) => (p.expanded ? p.depth : 'auto')}; 
     resize: both;
   `;
 
   export const Button = styled.div`
-    font-size: 24px;
+    font-size: 16px;
     width: max-content;
     padding: 4px;
     border-radius: 4px;
@@ -65,10 +67,11 @@ namespace Styled {
 
   export const Header = styled.div`
     padding-left: 16px;
-    padding-top: 10px;
+    padding-top: 4px;
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
   `;
 }
 
@@ -81,21 +84,36 @@ export type ExpandableContainerProps = {
   expandedPosition?: string;
   expandedWidth?: string;
   expandedHeight?: string;
+  expanded?: (_expanded: boolean) => void;
 };
 
 export default function ExpandableContainer(props: React.PropsWithChildren<ExpandableContainerProps>) {
-  const {backgroundColor, header, collapseOnClickOutside, startAsExpanded, expandedOpacity, expandedPosition, expandedHeight, expandedWidth} = props;
+  const {
+    backgroundColor, 
+    header, 
+    collapseOnClickOutside, 
+    startAsExpanded, 
+    expandedOpacity, 
+    expandedPosition, 
+    expandedHeight, 
+    expandedWidth, 
+    expanded: expandedCallback,
+  } = props;
   const [expanded, setExpanded] = useState<boolean>(startAsExpanded ?? false);
+  const componentExpanded = useCallback((exp: boolean) => {
+    setExpanded(exp);
+    expandedCallback && expandedCallback(exp);
+  }, [expandedCallback]);
   const headerComponent = (
-    <Styled.Header>
+    <Styled.Header className="handle">
       {expanded ? (
-        <Styled.Button onClick={() => setExpanded(!expanded)}>
+        <Styled.Button onClick={() => componentExpanded(!expanded)}>
           &#9196;
           <Styled.Tooltip>Collapse</Styled.Tooltip>
         </Styled.Button>
       ) : (
         <Styled.Button
-          onClick={() => setExpanded(!expanded)}>
+          onClick={() => componentExpanded(!expanded)}>
           &#9195;
           <Styled.Tooltip>Expand</Styled.Tooltip>
         </Styled.Button>
@@ -103,18 +121,22 @@ export default function ExpandableContainer(props: React.PropsWithChildren<Expan
       {header}
     </Styled.Header>
   );
+  const depth = useContext(DepthContext);
 
-  return <OutsideClickObserver
-      onClickOutside={(outside: boolean) => outside && setExpanded(!collapseOnClickOutside) }>
+  return <DepthContext.Provider value={depth + 1}>
+    <OutsideClickObserver
+      onClickOutside={(outside: boolean) => outside && componentExpanded(!collapseOnClickOutside) }>
       <Styled.Container 
         backgroundColor={backgroundColor}
         expanded={expanded} 
         expandedOpacity={expandedOpacity} 
         expandedPosition={expandedPosition} 
         expandedHeight={expandedHeight} 
-        expandedWidth={expandedWidth}>
+        expandedWidth={expandedWidth}
+        depth={depth}>
         {headerComponent}
         {props.children}  
       </Styled.Container>
-    </OutsideClickObserver>;
+    </OutsideClickObserver>
+  </DepthContext.Provider>;
 }

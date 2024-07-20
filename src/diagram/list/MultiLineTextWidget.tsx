@@ -70,7 +70,7 @@ function LineComponent(props: {
     lastIndex = curIndex;
   }
   if (lastIndex < line.length) {
-    segs.push(<Styled.Text key={lastIndex} color={color}>{line.substring(lastIndex)}</Styled.Text>);
+    segs.push(<Styled.Text key={lastIndex + 1} color={color}>{line.substring(lastIndex)}</Styled.Text>);
   }
   return <Styled.Line>{segs}</Styled.Line>;
 }

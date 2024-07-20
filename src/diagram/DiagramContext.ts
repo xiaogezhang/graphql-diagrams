@@ -1,6 +1,7 @@
 import {createContext} from 'react';
 import {ClickableTarget} from './list/ClickableText';
-import { DiagramEngine } from '@projectstorm/react-diagrams';
+import {DiagramEngine} from '@projectstorm/react-diagrams';
+import { GraphQLDiagramElementType } from './graphql/GraphQLNodeTypes';
 
 export interface HiddenDisplayOptions {
   [index: string]: boolean;
@@ -12,12 +13,17 @@ export type DisplayOptions = {
 };
 
 export type ActionOptions = {
-  click: (context: DiagramContextType, target: ClickableTarget) => void;
+  click: (
+    context: DiagramContextType,
+    target: ClickableTarget,
+    element?: HTMLElement | null,
+  ) => Promise<void>;
 };
 
-export type DiagramContextType = ActionOptions & DisplayOptions & {
-  engine?: DiagramEngine;
-};
+export type DiagramContextType = ActionOptions &
+  DisplayOptions & {
+    engine?: DiagramEngine;
+  };
 
 export function createDiagramContext(
   displayOptions?: HiddenDisplayOptions,
@@ -28,8 +34,8 @@ export function createDiagramContext(
   function isVisible(elementType: string): boolean {
     return !elementVisibilities[elementType];
   }
-  const actions: ActionOptions = actionOptions || {
-    click: (_c: DiagramContextType, _t: ClickableTarget) => void {},
+  const actions: ActionOptions = actionOptions ?? {
+    click: async (_c: DiagramContextType, _t: ClickableTarget, _e?: HTMLElement | null) => void {},
   };
   return {
     hiddenDisplayOptions: elementVisibilities,
@@ -37,6 +43,17 @@ export function createDiagramContext(
     ...actions,
     engine: engine,
   };
+}
+
+function createDefaultDiagramContext(): DiagramContextType {
+  const displayOptions: HiddenDisplayOptions = {};
+  displayOptions[GraphQLDiagramElementType.META_LINK] = true;
+  displayOptions[GraphQLDiagramElementType.INHERITANCE_LINK] = true;
+  displayOptions[GraphQLDiagramElementType.INPUT_OBJECT_TYPE] = true;
+  displayOptions[GraphQLDiagramElementType.INTERFACE] = false;
+  displayOptions[GraphQLDiagramElementType.ENUM_TYPE] = false;
+  displayOptions[GraphQLDiagramElementType.OBJECT_TYPE] = false;
+  return createDiagramContext(displayOptions);
 }
 
 export function setDisplayOption(
@@ -79,11 +96,13 @@ export function toggleDisplayOption(
 }
 
 /**
- * Context for schema diagram to use within the canvas. Includes:
+ * Context for diagram to use within the canvas. Includes:
  * 1. display options: the types of diagram elements to show/hide
  * 2. action options: the actions for different type of targets
  * 3. engine: the engine for the diagram, which contains the model.
  */
-const DiagramContext = createContext<DiagramContextType>(createDiagramContext());
+const DiagramContext = createContext<DiagramContextType>(
+  createDefaultDiagramContext(),
+);
 
 export default DiagramContext;

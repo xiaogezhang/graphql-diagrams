@@ -41,24 +41,33 @@ namespace Styled {
 export default function SchemaDiagram(props: {
   sdl?: string;
   displayOptions?: HiddenDisplayOptions;
+  showOptions?: boolean;
 }) {
-  const {sdl, displayOptions} = props;
+  const {sdl, displayOptions, showOptions} = props;
   const {engine, nodeCount} = useGraphQLTypeGraph(sdl);
-  const [diagramOptions, setDiagramOptions] = React.useState<DiagramContextType>();
+  const diagramContext = useContext(DiagramContext);
+  const [diagramOptions, setDiagramOptions] = React.useState<DiagramContextType | undefined>();
   useEffect(() => {
-    const context = createDiagramContext(displayOptions, {click: click}, engine);
+    const context = createDiagramContext(displayOptions ?? diagramContext.hiddenDisplayOptions, {click: click}, engine);
     setDiagramOptions(_ => context);
-  }, [displayOptions, engine]);
-  return diagramOptions && nodeCount ? <DiagramContext.Provider value={diagramOptions}>
-    <SchemaDiagramIntern nodeCount={nodeCount} changeDiagramContext={setDiagramOptions}/>
-  </DiagramContext.Provider> : null;
+  }, [diagramContext, displayOptions, engine]);
+  return diagramOptions && nodeCount ? 
+    <DiagramContext.Provider value={diagramOptions}>
+      <SchemaDiagramIntern 
+        nodeCount={nodeCount} 
+        changeDiagramContext={setDiagramOptions}
+        showOptions={showOptions}
+      />
+    </DiagramContext.Provider> 
+  : null;
 }
 
 function SchemaDiagramIntern(props: {
   nodeCount: number;
+  showOptions?: boolean;
   changeDiagramContext: (context: DiagramContextType,) => void,
 }) {
-  const {nodeCount, changeDiagramContext} = props;
+  const {nodeCount, showOptions, changeDiagramContext} = props;
   const context = useContext(DiagramContext);
   if (context == null) {
     return null;
@@ -68,7 +77,7 @@ function SchemaDiagramIntern(props: {
     ? Object.keys(hiddenDisplayOptions)
     : null;
   const options =
-    optionKeys && optionKeys.length > 0 ? (
+    showOptions && optionKeys && optionKeys.length > 0 ? (
       <Styled.Float>
         {optionKeys.map((t, index) => (
           <Styled.Label key={index}>

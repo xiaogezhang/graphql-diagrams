@@ -6,12 +6,14 @@ export enum TargetType {
   URI = 'uri',
   NODE = 'node',
   HTML_ID = 'html_id',
+  SCHEMA = 'schema',
 }
 
 export interface ClickableTarget {
   type: TargetType;
   value: string;
 }
+
 /**
  * The background color is actually by its parent due to margin, padding etc. 
  */

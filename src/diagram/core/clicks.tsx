@@ -39,7 +39,11 @@ function scrollCanvas(engine: DiagramEngine, x: number, y: number): void {
   }
 }
 
-export function click(context: DiagramContextType, target?: ClickableTarget) {    
+export async function click(
+  context: DiagramContextType,
+  target?: ClickableTarget,
+  _?: HTMLElement | null,
+) {
   if (target && target.type === TargetType.NODE) {
     const {engine, isVisible} = context;
     // The following scrollToElement() method is messing up the internal offset of the canvas,
@@ -52,7 +56,7 @@ export function click(context: DiagramContextType, target?: ClickableTarget) {
         if (targetNode instanceof ListNodeModel) {
           // target node is not visible
           if (!targetNode.isVisible(isVisible)) {
-              return;
+            return;
           }
         }
         targetNode.setSelected();

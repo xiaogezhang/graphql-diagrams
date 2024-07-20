@@ -2,6 +2,7 @@ import {
   DiagramModel,
   DefaultLinkModel,
   DefaultPortModel,
+  DiagramEngine,
 } from '@projectstorm/react-diagrams';
 
 import tinycolor from 'tinycolor2';
@@ -29,6 +30,39 @@ import {
   MultiLineText,
   MultiLineTextListItemType,
 } from '../../list/MultiLineTextListItem';
+import React from 'react';
+import { DefaultDiagramEngine } from '../../DefaultDiagramEngine';
+import { TargetType } from '../../list/ClickableText';
+
+const MIN_NODE_COUNT: number = 50;
+
+export function useQueryPlanGraph(queryPlan?: string, queryStr?: string) {
+  const [graph, setGraph] = React.useState<{
+    engine?: DiagramEngine;
+    nodeCount?: number;
+  }>({});
+  React.useEffect(() => {
+    if (queryPlan) {
+      const engine = new DefaultDiagramEngine();
+      const model = createQueryPlanGraph(queryPlan, queryStr);
+      const nodes = model?.getNodes();
+      const nodeCount =
+        (nodes?.length ?? 0) / 4 < MIN_NODE_COUNT
+          ? MIN_NODE_COUNT
+          : (nodes?.length ?? 0) / 4;
+      if (model) {
+        engine.setModel(model);
+      }
+      setGraph((_) => ({
+        engine: engine,
+        nodeCount: nodeCount,
+      }));
+    } else {
+      setGraph((_) => ({nodeCount: 0})); 
+    }
+  }, [queryPlan, queryStr]);
+  return graph;
+}
 
 /**
  * Basically takes query plan JSON representation as input and generate a diagram model for UI.
@@ -289,7 +323,14 @@ function processFetchNode(
       MultiLineTextListItemType,
     );
     const headerLabel: string[] = ['Fetch (${' + node.serviceName + '})'];
-    sectionDict[node.serviceName] = {label: node.serviceName, color: FetchNodeHeaderColor};
+    sectionDict[node.serviceName] = {
+      label: node.serviceName, 
+      color: FetchNodeHeaderColor,
+      target: {
+        type: TargetType.SCHEMA,
+        value: node.serviceName,
+      }
+    };
     if (header) {
       header.setContent({
         content: headerLabel,

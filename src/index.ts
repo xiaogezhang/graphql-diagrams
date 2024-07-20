@@ -5,6 +5,11 @@ import ListNodeWidget from './diagram/node/ListNodeWidget';
 import QueryPlanDiagram from './diagram/QueryPlanDiagram';
 import Canvas from './diagram/Canvas';
 import DiagramContext from './diagram/DiagramContext';
+import DepthContext from './diagram/DepthContext';
+import GraphQLContext from './diagram/graphql/GraphQLContext';
+import Viewport from './diagram/Viewport';
+
+export {type ViewportProps} from './diagram/Viewport';
 
 export { HideableLinkFactory } from './diagram/link/HideableLinkFactory';
 
@@ -66,5 +71,5 @@ export {getTextColor} from './diagram/utils/color';
 
 export {type TreeNode, type LayoutConfig, layout} from './diagram/layout';
 
-export {Canvas, DiagramContext, ExpandableContainer, SchemaDiagram, OutsideClickObserver, ListNodeWidget, QueryPlanDiagram} ;
+export {Canvas, DepthContext, DiagramContext, GraphQLContext, ExpandableContainer, SchemaDiagram, OutsideClickObserver, ListNodeWidget, QueryPlanDiagram, Viewport} ;
 
