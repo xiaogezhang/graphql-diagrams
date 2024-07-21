@@ -7,7 +7,7 @@ import { CircularProgress } from '@mui/material';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { ExpandableContainer, GraphQLDiagramElementType, QueryPlanDiagram, SchemaDiagram } from 'graphql-diagrams';
+import { ExpandableContainer, GraphQLContext, type GraphQLContextType, GraphQLDiagramElementType, QueryPlanDiagram, SchemaDiagram } from 'graphql-diagrams';
 
 function TwoTabs(props: {
   left: React.JSX.Element;
@@ -87,6 +87,18 @@ export default function App() {
   displayOptions[GraphQLDiagramElementType.ENUM_TYPE] = false;
   displayOptions[GraphQLDiagramElementType.OBJECT_TYPE] = false;
 
+  const prevContext = React.useContext(GraphQLContext);
+
+  const graphqlContext: GraphQLContextType = {
+    ...prevContext,
+    fetchSchema: async (subgraph: string) => {
+      if (schema) {
+        return schema;
+      }
+      throw new Error('Schema for "' + subgraph + '" not available.');
+    },
+  }
+
   return (
     <Box width={window.innerWidth - 100} height={window.innerHeight - 20} gap={2} overflow='hidden' 
       sx={{justifyContent: 'flex-start', flexGrow: 1, display: 'flex'}}>
@@ -147,7 +159,9 @@ export default function App() {
                   header={<a href="https://www.apollographql.com/docs/federation/query-plans/" rel="noopener" target="_blank">
                     Doc: Apollo Query Plan
                   </a>}>
-                  <QueryPlanDiagram queryPlan={queryPlan} queryStr={queryStr}/>
+                  <GraphQLContext.Provider value={graphqlContext}>
+                    <QueryPlanDiagram queryPlan={queryPlan} queryStr={queryStr}/>
+                  </GraphQLContext.Provider>
                 </ExpandableDiagram>} 
               right={<div className="code">{queryPlan}</div>}/>
           : 
