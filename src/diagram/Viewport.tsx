@@ -18,7 +18,7 @@ namespace Styled {
     depth?: number;
   }>`
     background-color: ${(p) => p.backgroundColor ?? 'inherit'};
-    border: ${(p) => p.border ? p.border : ''};
+    border: ${(p) => (p.border ? p.border : '')};
     position: ${(p) =>
       p.left !== undefined && p.top !== undefined ? 'fixed' : 'inherit'};
     top: ${(p) => p.top ?? 'auto'};
@@ -33,16 +33,13 @@ namespace Styled {
     resize: ${(p) => (p.resizable ? 'both' : 'none')};
     z-index: ${(p) => (p.depth ? p.depth : 'auto')};
   `;
-
 }
-    //max-height: ${(p) => p.maxHeight ?? 'none'};
-    //max-width: ${(p) => p.maxWidth ?? 'none'};
 
-export type ViewportProps = {
+export type ViewportProps = {  
   backgroundColor?: string;
   border?: string;
-  left?: string;
-  top?: string;
+  left?: number;
+  top?: number;
   width?: string;
   height?: string;
   maxWidth?: string;
@@ -54,23 +51,48 @@ export type ViewportProps = {
   depth?: number;
 };
 
-export default function Viewport(props: React.PropsWithChildren<ViewportProps>) {
-  const {backgroundColor, border, left, top, width, height, maxWidth, maxHeight, opacity, draggable, draggableHandle, resizable, depth} = props;
+const Viewport = React.forwardRef(function Viewport(
+  props: React.PropsWithChildren<ViewportProps>, ref?: React.ForwardedRef<HTMLDivElement>
+) {
+  const {
+    backgroundColor,
+    border,
+    left,
+    top,
+    width,
+    height,
+    maxWidth,
+    maxHeight,
+    opacity,
+    draggable,
+    draggableHandle,
+    resizable,
+    depth,
+  } = props;
   const winMaxWidth = window.innerWidth - 20;
   const winMaxHeight = window.innerHeight - 20;
-  const component = <Styled.Container
+  const component = (
+    <Styled.Container
+      ref={ref}
       backgroundColor={backgroundColor}
       border={border}
-      left={left}
-      top={top}
+      left={left + 'px'}
+      top={top + 'px'}
       width={width}
       height={height}
-      maxWidth={maxWidth ?? (winMaxWidth + 'px')}
-      maxHeight={maxHeight ?? (winMaxHeight+ 'px')}
+      maxWidth={maxWidth ?? winMaxWidth + 'px'}
+      maxHeight={maxHeight ?? winMaxHeight + 'px'}
       opacity={opacity}
       resizable={resizable}
       depth={depth}>
       {props.children}
-    </Styled.Container>;
-  return draggable ? <Draggable handle={draggableHandle}>{component}</Draggable>: component;
-}
+    </Styled.Container>
+  );
+  return draggable ? (
+    <Draggable handle={draggableHandle}>{component}</Draggable>
+  ) : (
+    component
+  );
+});
+
+export default Viewport;

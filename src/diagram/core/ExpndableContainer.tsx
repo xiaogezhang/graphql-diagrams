@@ -85,6 +85,7 @@ export type ExpandableContainerProps = {
   expandedWidth?: string;
   expandedHeight?: string;
   expanded?: (_expanded: boolean) => void;
+  headerClassName?: string;
 };
 
 export default function ExpandableContainer(props: React.PropsWithChildren<ExpandableContainerProps>) {
@@ -98,6 +99,7 @@ export default function ExpandableContainer(props: React.PropsWithChildren<Expan
     expandedHeight, 
     expandedWidth, 
     expanded: expandedCallback,
+    headerClassName,
   } = props;
   const [expanded, setExpanded] = useState<boolean>(startAsExpanded ?? false);
   const componentExpanded = useCallback((exp: boolean) => {
@@ -105,7 +107,7 @@ export default function ExpandableContainer(props: React.PropsWithChildren<Expan
     expandedCallback && expandedCallback(exp);
   }, [expandedCallback]);
   const headerComponent = (
-    <Styled.Header className="handle">
+    <Styled.Header className={headerClassName}>
       {expanded ? (
         <Styled.Button onClick={() => componentExpanded(!expanded)}>
           &#9196;

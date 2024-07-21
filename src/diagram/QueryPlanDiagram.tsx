@@ -1,6 +1,6 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
-import {Alert, Button, CircularProgress, Tooltip} from '@mui/material';
+import {Alert, CircularProgress} from '@mui/material';
 
 import Canvas from './Canvas';
 import {useQueryPlanGraph} from './graphql/queryPlan/QueryPlanGraph';
@@ -12,7 +12,6 @@ import DepthContext from './DepthContext';
 import OutsideClickObserver from './core/hooks';
 import SchemaDiagram from './SchemaDiagram';
 import ExpandableContainer from './core/ExpndableContainer';
-import Draggable from 'react-draggable';
 
 namespace Styled {
   export const Loading = styled.div`
@@ -20,9 +19,10 @@ namespace Styled {
     padding-top: 4px;
     padding-bottom: 4px;
     padding-left: 16px;
+    padding-right: 16px;
     flex-direction: row;
     align-items: center;
-    column-gap: 20px;
+    column-gap: 24px;
   `;
 
   export const Header = styled.div`
@@ -32,6 +32,7 @@ namespace Styled {
     padding-left: 16px;
     flex-direction: row;
     align-items: center;
+    margin-right: 16px;
     justify-content: space-between;
   `;
 
@@ -51,6 +52,7 @@ namespace Styled {
 
   export const Button = styled.div`
     font-size: 16px;
+    color: blue;
     width: max-content;
     padding: 4px;
     border-radius: 4px;
@@ -89,14 +91,34 @@ function LoadingComponent(props: {close?: () => void}) {
     <Styled.Loading>
       <CircularProgress />
       {close ? (
-        <Tooltip title="close">
-          <Button size="medium" title="close" onClick={close}>
-            X
-          </Button>
-        </Tooltip>
+        <Styled.Button onClick={close}>
+          X<Styled.Tooltip>Close</Styled.Tooltip>
+        </Styled.Button>
       ) : null}
     </Styled.Loading>
   );
+}
+
+type SubgraphDimension = {
+  left: number;
+  top: number;
+  width?: number;
+  height?: number;
+};
+
+function domRectToDimension(hasSchema: boolean, useSize: boolean, rect?: DOMRect): SubgraphDimension | undefined {
+  if (rect) {
+    const left = hasSchema && useSize ? rect.left : rect.right + 4;
+    const top = hasSchema && useSize ? rect.top : (rect.top - 100 > 0? rect.top - (hasSchema ? 125 : 0) : 0);
+    return {
+      left: left,
+      top: top,
+      width: useSize? (rect.right - rect.left) : undefined,
+      height: useSize? (rect.bottom - rect.top) : undefined,
+    };
+  } else {
+    return undefined;
+  }
 }
 
 type SubgraphProps = {
@@ -104,8 +126,43 @@ type SubgraphProps = {
   error?: string;
   subgraph?: string;
   showSchema: boolean;
-  sourceRect?: DOMRect;
+  //sourceRect?: DOMRect;
+  dimension?: SubgraphDimension; 
 };
+
+const ViewportComponent = React.forwardRef(function ViewportComponent(
+  props: React.PropsWithChildren<{
+    schema?: string;
+    expanded: boolean;
+    top: number;
+    left: number;
+    width?: number;
+    height?: number;
+    depth: number;
+  }>,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
+  const {schema, expanded, top, left, width, height, depth} = props;
+  const widthToUse = width ? (width + 'px') : (schema ? '400px' : 'fit-content');
+  const heightToUse = height ? (height + 'px') : (schema ? '400px' : 'fit-content');
+  return (
+    <Viewport
+      ref={ref}
+      backgroundColor="rgb(220, 230, 220)"
+      border="3px solid rgb(200,210,200)"
+      left={left}
+      top={top}
+      width={widthToUse}
+      height={heightToUse}
+      opacity={0.9}
+      draggable={!expanded}
+      draggableHandle=".handle"
+      resizable={schema ? true : false}
+      depth={depth}>
+      {props.children}
+    </Viewport>
+  );
+});
 
 export default function QueryPlanDiagram(props: {
   queryPlan?: string;
@@ -127,7 +184,7 @@ export default function QueryPlanDiagram(props: {
       const rect = elem?.getBoundingClientRect();
       setSubgraphProps({
         showSchema: true,
-        sourceRect: rect,
+        dimension: domRectToDimension(false, false, rect),
         subgraph: subgraph,
       });
       await graphqlActions
@@ -136,12 +193,14 @@ export default function QueryPlanDiagram(props: {
           setSubgraphProps((prev) => ({
             ...prev,
             schema: sdl,
+            dimension: domRectToDimension(true, false, rect),
           }));
         })
         .catch((error) => {
           setSubgraphProps((prev) => ({
             ...prev,
             error: error.toString(),
+            dimension: domRectToDimension(false, false, rect),
           }));
         });
     }
@@ -163,6 +222,7 @@ export default function QueryPlanDiagram(props: {
             showSchema: false,
           }))
         }
+        updateSubgraph={setSubgraphProps}
       />
     </DiagramContext.Provider>
   ) : null;
@@ -171,21 +231,36 @@ export default function QueryPlanDiagram(props: {
 function QueryPlanDiagramIntern(props: {
   subgraphProps: SubgraphProps;
   nodeCount: number;
-  sourceRect?: DOMRect;
   close: () => void;
+  updateSubgraph: (props: SubgraphProps) => void;
 }) {
-  const {nodeCount, subgraphProps, close} = props;
-  const {schema, error, subgraph, showSchema, sourceRect} = subgraphProps;
+  const {nodeCount, subgraphProps, close, updateSubgraph} = props;
+  const {schema, error, subgraph, showSchema, dimension} = subgraphProps;
   const {engine} = React.useContext(DiagramContext);
   const depth = React.useContext(DepthContext);
   const [expanded, setExpanded] = React.useState<boolean>(false);
-  const left = (sourceRect?.right ?? 0) + 4;
-  const top =
-    (sourceRect?.top ?? 0) - 100 > 0 ? (sourceRect?.top ?? 0) - (schema ? 125 : 0) : 0;
-  const closeAction = useCallback(() => {
+  
+  const closeAction = React.useCallback(() => {
     setExpanded(false);
     close && close();
   }, [close]);
+  const ref = React.useRef<HTMLDivElement | null>(null);
+  const expandAction = React.useCallback(
+    (e: boolean) => {
+      if (ref.current) {
+        const rect = ref.current.getBoundingClientRect();
+        if (e) {
+          updateSubgraph({
+            ...subgraphProps,
+            dimension: domRectToDimension(true, true, rect),
+          });
+        }
+      }
+      setExpanded(e);
+    },
+    [ref, subgraphProps, updateSubgraph, setExpanded],
+  );
+
   return engine ? (
     <>
       <Canvas
@@ -195,20 +270,17 @@ function QueryPlanDiagramIntern(props: {
         rows={nodeCount}
         nodeHeight={150}
       />
-      {showSchema ? (
+      {showSchema && dimension? (
         <DepthContext.Provider value={depth + 1}>
-          <Viewport
-            backgroundColor="rgb(220, 230, 220)"
-            border="3px solid rgb(200,210,200)"
-            left={left + 'px'}
-            top={top + 'px'}
-            width={schema ? '400px' : 'fit-content'}
-            height={schema ? '400px' : 'fit-content'}
-            opacity={0.9}
-            draggable={true}
-            draggableHandle='.handle'
-            resizable={schema ? true : false}
-            depth={depth}>
+          <ViewportComponent
+            schema={schema}
+            expanded={expanded}
+            top={dimension.top}
+            left={dimension.left}
+            width={dimension.width}
+            height={dimension.height}
+            depth={depth}
+            ref={ref}>
             {error ? (
               <OutsideClickObserver
                 onClickOutside={(outside: boolean) => outside && closeAction()}>
@@ -217,31 +289,29 @@ function QueryPlanDiagramIntern(props: {
                 </Alert>
               </OutsideClickObserver>
             ) : schema ? (
-                <ExpandableContainer
-                  backgroundColor="rgb(220, 230, 220)"
-                  collapseOnClickOutside={true}
-                  header={
-                    <Styled.Header>
-                      <Styled.Title>
-                        Subgraph: <Styled.Name>{subgraph}</Styled.Name>
-                      </Styled.Title>
-                      <Styled.Button onClick={closeAction}>
-                        X<Styled.Tooltip>Close</Styled.Tooltip>
-                      </Styled.Button>
-                    </Styled.Header>
-                  }
-                  startAsExpanded={false}
-                  expandedOpacity={0.9}
-                  expandedPosition="fixed"
-                  expandedHeight="90%"
-                  expandedWidth="90%"
-                  expanded={setExpanded}>
-                  <SchemaDiagram sdl={schema} showOptions={expanded} />
-                </ExpandableContainer>
+              <ExpandableContainer
+                backgroundColor="rgb(220, 230, 220)"
+                collapseOnClickOutside={true}
+                header={
+                  <Styled.Header>
+                    <Styled.Title>
+                      Subgraph: <Styled.Name>{subgraph}</Styled.Name>
+                    </Styled.Title>
+                    <Styled.Button onClick={closeAction}>
+                      X<Styled.Tooltip>Close</Styled.Tooltip>
+                    </Styled.Button>
+                  </Styled.Header>
+                }
+                startAsExpanded={expanded}
+                expandedOpacity={0.98}
+                expanded={expandAction}
+                headerClassName="handle">
+                <SchemaDiagram sdl={schema} showOptions={expanded} />
+              </ExpandableContainer>
             ) : (
               <LoadingComponent close={closeAction} />
             )}
-          </Viewport>
+          </ViewportComponent>
         </DepthContext.Provider>
       ) : null}
     </>
