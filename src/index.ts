@@ -9,6 +9,8 @@ import DepthContext from './diagram/DepthContext';
 import GraphQLContext from './diagram/graphql/GraphQLContext';
 import Viewport from './diagram/Viewport';
 
+export {type GraphQLContextType} from './diagram/graphql/GraphQLContext';
+
 export {type ViewportProps} from './diagram/Viewport';
 
 export { HideableLinkFactory } from './diagram/link/HideableLinkFactory';
