@@ -1,9 +1,11 @@
 import React, {useCallback, useContext, useState} from 'react';
 
 import styled from '@emotion/styled';
+import tinycolor from 'tinycolor2';
 import OutsideClickObserver from './hooks';
 import DepthContext from '../DepthContext';
 import '../Diagram.css';
+import { light } from '@mui/material/styles/createPalette';
 
 namespace Styled {
   export const Container = styled.div<{
@@ -65,8 +67,14 @@ namespace Styled {
     z-index: 100;
   `;
 
-  export const Header = styled.div`
+  export const Header = styled.div<{
+    backgroundColor?: string;
+    expanded?: boolean;
+  }>`
+    background-color: ${(p) =>
+      p.backgroundColor ?? (p.expanded ? 'rgb(225, 225, 225)' : 'inherit')};
     padding-left: 16px;
+    padding-right: 16px;
     padding-top: 4px;
     display: flex;
     flex-direction: row;
@@ -106,8 +114,16 @@ export default function ExpandableContainer(props: React.PropsWithChildren<Expan
     setExpanded(exp);
     expandedCallback && expandedCallback(exp);
   }, [expandedCallback]);
+  const tinyColor = backgroundColor ? tinycolor(backgroundColor) : undefined;
+  const headerBackground = tinyColor ? (
+      tinyColor.isLight() ? 
+        tinyColor.darken(3).toRgbString() 
+        : 
+        tinyColor.lighten(3).toRgbString()
+    ) 
+    : undefined;
   const headerComponent = (
-    <Styled.Header className={headerClassName}>
+    <Styled.Header className={headerClassName} expanded={expanded} backgroundColor={headerBackground}>
       {expanded ? (
         <Styled.Button onClick={() => componentExpanded(!expanded)}>
           &#9196;
@@ -123,7 +139,7 @@ export default function ExpandableContainer(props: React.PropsWithChildren<Expan
       {header}
     </Styled.Header>
   );
-  const depth = useContext(DepthContext);
+  const depth = useContext(DepthContext);  
 
   return <DepthContext.Provider value={depth + 1}>
     <OutsideClickObserver

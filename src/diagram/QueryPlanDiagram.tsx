@@ -32,7 +32,6 @@ namespace Styled {
     padding-left: 16px;
     flex-direction: row;
     align-items: center;
-    margin-right: 16px;
     justify-content: space-between;
   `;
 
