@@ -8,6 +8,11 @@ import DiagramContext from './diagram/DiagramContext';
 import DepthContext from './diagram/DepthContext';
 import GraphQLContext from './diagram/graphql/GraphQLContext';
 import Viewport from './diagram/Viewport';
+import SidePane from './diagram/side/SidePane';
+
+export {type Anchor, useClickOutside, useResize} from './diagram/core/hooks';
+
+export {type SidePaneProps} from './diagram/side/SidePane'; 
 
 export {type GraphQLContextType} from './diagram/graphql/GraphQLContext';
 
@@ -73,5 +78,5 @@ export {getTextColor} from './diagram/utils/color';
 
 export {type TreeNode, type LayoutConfig, layout} from './diagram/layout';
 
-export {Canvas, DepthContext, DiagramContext, GraphQLContext, ExpandableContainer, SchemaDiagram, OutsideClickObserver, ListNodeWidget, QueryPlanDiagram, Viewport} ;
+export {Canvas, DepthContext, DiagramContext, GraphQLContext, ExpandableContainer, SchemaDiagram, OutsideClickObserver, ListNodeWidget, QueryPlanDiagram, SidePane, Viewport} ;
 

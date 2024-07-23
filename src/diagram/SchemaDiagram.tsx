@@ -46,26 +46,32 @@ export default function SchemaDiagram(props: {
   const {sdl, displayOptions, showOptions} = props;
   const {engine, nodeCount} = useGraphQLTypeGraph(sdl);
   const diagramContext = useContext(DiagramContext);
-  const [diagramOptions, setDiagramOptions] = React.useState<DiagramContextType | undefined>();
+  const [diagramOptions, setDiagramOptions] = React.useState<
+    DiagramContextType | undefined
+  >();
   useEffect(() => {
-    const context = createDiagramContext(displayOptions ?? diagramContext.hiddenDisplayOptions, {click: click}, engine);
-    setDiagramOptions(_ => context);
+    const context = createDiagramContext(
+      displayOptions ?? diagramContext.hiddenDisplayOptions,
+      {click: click},
+      engine,
+    );
+    setDiagramOptions((_) => context);
   }, [diagramContext, displayOptions, engine]);
-  return diagramOptions && nodeCount ? 
+  return diagramOptions && nodeCount ? (
     <DiagramContext.Provider value={diagramOptions}>
-      <SchemaDiagramIntern 
-        nodeCount={nodeCount} 
+      <SchemaDiagramIntern
+        nodeCount={nodeCount}
         changeDiagramContext={setDiagramOptions}
         showOptions={showOptions}
       />
-    </DiagramContext.Provider> 
-  : null;
+    </DiagramContext.Provider>
+  ) : null;
 }
 
 function SchemaDiagramIntern(props: {
   nodeCount: number;
   showOptions?: boolean;
-  changeDiagramContext: (context: DiagramContextType,) => void,
+  changeDiagramContext: (context: DiagramContextType) => void;
 }) {
   const {nodeCount, showOptions, changeDiagramContext} = props;
   const context = useContext(DiagramContext);
@@ -96,7 +102,7 @@ function SchemaDiagramIntern(props: {
       </Styled.Float>
     ) : null;
   return engine ? (
-    <>
+    <div>
       <Canvas
         engine={engine}
         columns={nodeCount ?? 4}
@@ -105,6 +111,6 @@ function SchemaDiagramIntern(props: {
         nodeHeight={150}
       />
       {options}
-    </>
+    </div>
   ) : null;
 }
