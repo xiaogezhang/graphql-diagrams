@@ -18,7 +18,11 @@ namespace Styled {
     overflow: hidden;
   `;
 }
-
+/**
+ * This is code from the lib "react-diagrams". There's bug in the code so I have to
+ * make a copy and fix here, as the fix I submitted to "react-diagrams" repository
+ * gets no response
+ */
 export function CanvasWidget(props: DiagramProps) {
   const ref = React.useRef(null);
   const [, forceUpdate] = React.useReducer(x => x + 1, 0);

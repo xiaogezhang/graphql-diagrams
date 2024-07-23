@@ -15,6 +15,7 @@ export function useResize(
 
   const enableResize = React.useCallback(
     (e: React.MouseEvent) => {
+      e.stopPropagation();
       const curCoord =
         anchor === 'left' || anchor === 'right' ? e.clientX : e.clientY;
       setResizingStatus({
@@ -90,6 +91,13 @@ export function useClickOutside(ref, onClickOutside?: (_: boolean) => void) {
   }, [ref, onClickOutside]);
 }
 
+/**
+ * Wrapper component for React components, so it can observe the click events outside of the wrapped
+ * component. It takes in a callback and a child component as prop.
+ * 
+ * @param props 
+ * @returns 
+ */
 export default function OutsideClickObserver(
   props: React.PropsWithChildren<{onClickOutside?: (_: boolean) => void}>,
 ) {

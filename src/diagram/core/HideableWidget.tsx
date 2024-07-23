@@ -10,6 +10,7 @@ export interface HideableWidgetProps {
 
 /**
  * Wrap a widget so it can be hidden
+ * Currently the hideable objects include nodes and links. 
  *
  * @param props model that is hideable
  */

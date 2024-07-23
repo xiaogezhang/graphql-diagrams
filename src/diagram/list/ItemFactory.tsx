@@ -24,6 +24,9 @@ export class SimpleTextListItemFactory extends ItemFactory<string> {
   }
 }
 
+/**
+ * Factory to create different kinds of items and their React component
+ */
 export class LeftAndRightListItemFactory extends ItemFactory<LeftAndRight> {
   constructor() {
     super(LeftAndRightListItemType);

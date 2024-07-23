@@ -38,6 +38,10 @@ namespace Styled {
   `;
 }
 
+/**
+ * React component for GraphQL schema diagram. Also contains display options such as show/hide 
+ * inheritance, show/hide input object types etc.
+ */
 export default function SchemaDiagram(props: {
   sdl?: string;
   displayOptions?: HiddenDisplayOptions;

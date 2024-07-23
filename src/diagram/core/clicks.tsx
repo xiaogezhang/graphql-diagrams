@@ -39,6 +39,14 @@ function scrollCanvas(engine: DiagramEngine, x: number, y: number): void {
   }
 }
 
+/**
+ * Action handler for different kinds of target types. Usually this is provided through
+ * diagram context to the elements in the diagram.
+ * 
+ * @param context context info about the diagram. Accessible by elements in the diagram
+ * @param target target definition, such as node, url, schema etc. Currently only support node inside the diagram
+ * @returns 
+ */
 export async function click(
   context: DiagramContextType,
   target?: ClickableTarget,

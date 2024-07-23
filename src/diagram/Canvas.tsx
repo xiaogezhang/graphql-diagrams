@@ -18,6 +18,13 @@ namespace Styled {
   `;
 }
 
+/**
+ * A simple wrapper component for CanvasWidget component to calculate the dimension
+ * of the diagram.
+ * 
+ * @param props 
+ * @returns 
+ */
 export default function Canvas(props: {
   engine: DiagramEngine;
   rows?: number;

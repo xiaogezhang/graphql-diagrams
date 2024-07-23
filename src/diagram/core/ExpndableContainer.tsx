@@ -5,7 +5,6 @@ import tinycolor from 'tinycolor2';
 import OutsideClickObserver from './hooks';
 import DepthContext from '../DepthContext';
 import '../Diagram.css';
-import { light } from '@mui/material/styles/createPalette';
 
 namespace Styled {
   export const Container = styled.div<{
@@ -84,18 +83,23 @@ namespace Styled {
 }
 
 export type ExpandableContainerProps = {
-  collapseOnClickOutside?: boolean;
-  backgroundColor?: string,
-  header?: React.JSX.Element;
-  startAsExpanded?: boolean,
-  expandedOpacity?: number,
+  collapseOnClickOutside?: boolean; // If true, after expanded, click outside of the component will collpase it
+  backgroundColor?: string, 
+  header?: React.JSX.Element; // There's one button on top left to expand/collapse. Other components can be put in the hdeader
+  startAsExpanded?: boolean, // If true, the component will start as expanded state, otherwise in collapsed state
+  expandedOpacity?: number, // opacity after expanded, value between 0 and 1. 0 is transparent, 1 is opaque.
   expandedPosition?: string;
-  expandedWidth?: string;
+  expandedWidth?: string; // it can be number of pixels, or percentage of screen, e.g: '600px', '90%' etc
   expandedHeight?: string;
   expanded?: (_expanded: boolean) => void;
   headerClassName?: string;
 };
 
+/**
+ * Wrapper component for React components that can be expanded and collapse.
+ * @param props 
+ * @returns 
+ */
 export default function ExpandableContainer(props: React.PropsWithChildren<ExpandableContainerProps>) {
   const {
     backgroundColor, 

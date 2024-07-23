@@ -4,6 +4,9 @@ import {DiagramEngine} from '@projectstorm/react-diagrams-core';
 import {ListNodeModel, ListNodeModelType} from './ListNodeModel';
 import ListNodeWidget from './ListNodeWidget';
 
+/**
+ * Factory to create the type of nodes used in GraphQL diagram. Mainly ListNodeModel
+ */
 export class ListNodeFactory extends AbstractReactFactory<
   ListNodeModel,
   DiagramEngine

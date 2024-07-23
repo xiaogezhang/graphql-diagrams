@@ -6,8 +6,11 @@ import {ClickableTextWidget} from './ClickableTextWidget';
 
 export const SimpleTextListItemType: string = 'SimpleTextListItem';
 
+/**
+ * List item that contains a simple clicable text. Target may be node
+ * in the diagram, url or schema.
+ */
 export class SimpleTextListItem extends ListItemModel<ClickableText> {
-
   constructor(content?: ClickableText) {
     super(SimpleTextListItemType);
     this.content = content;

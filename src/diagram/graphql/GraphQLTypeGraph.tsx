@@ -78,6 +78,9 @@ function getElementType(
   return GraphQLDiagramElementType.UNKNOWN;
 }
 
+/**
+ * Create type node for a GraphQL type
+ */
 function createTypeNode(
   diagramModel: DiagramModel,
   type:
@@ -118,6 +121,10 @@ function createTypeNode(
   return typeTreeNode;
 }
 
+/**
+ * For all the hydrateXXX() functions below: populate the content of the GraphQL type, 
+ * e.g for object type, populate field definitions.
+ */
 function hydrateUnionType(
   diagramModel: DiagramModel,
   type: GraphQLUnionType,
@@ -336,6 +343,13 @@ function addImplementsLinks(
   }
 }
 
+/**
+ * Hook to create model for the GraphQL schema. It hides dependencies and details. 
+ * It's preferred to the createTypeGraph() function below if used in a React component.
+ * 
+ * @param sdl schema definition string.
+ * @returns 
+ */
 export function useGraphQLTypeGraph(sdl?: string) { 
   const [graph, setGraph] = React.useState<{
     engine?: DiagramEngine, 

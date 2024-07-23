@@ -163,6 +163,10 @@ const ViewportComponent = React.forwardRef(function ViewportComponent(
   );
 });
 
+/**
+ * React component for query plan. Create diagram model from Apollo query plan 
+ * and create React component on the diagram model.
+ */
 export default function QueryPlanDiagram(props: {
   queryPlan?: string;
   queryStr?: string;
@@ -269,7 +273,7 @@ function QueryPlanDiagramIntern(props: {
         rows={nodeCount}
         nodeHeight={150}
       />
-      {showSchema && dimension? (
+      {showSchema && dimension ? (
         <DepthContext.Provider value={depth + 1}>
           <ViewportComponent
             schema={schema}

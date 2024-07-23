@@ -19,7 +19,9 @@ export type MultiLineText = {
 };
 
 /**
- * Model for a list item that has multiple lines of text
+ * Model for a list item that has multiple lines of text. There are placeholders 
+ * in the text that can be replaced with real values from clickableTexts dict. The 
+ * placeholder is in the format ${var_name}
  */
 export class MultiLineTextListItem extends ListItemModel<MultiLineText> {
   constructor(content?: MultiLineText) {

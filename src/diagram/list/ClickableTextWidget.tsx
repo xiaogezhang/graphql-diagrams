@@ -41,6 +41,10 @@ export interface ClickableTextProps {
   onClick?: () => void;
 }
 
+/**
+ * React component for clickable text model. If it has target, it will be rendered as 
+ * clickable link. 
+ */
 export function ClickableTextWidget(props: ClickableTextProps) {
   const ref = React.useRef(null);
   const {content, onClick} = props;

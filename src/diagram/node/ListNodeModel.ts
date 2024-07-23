@@ -26,6 +26,11 @@ export interface ListNodeModelGenerics extends DefaultNodeModelGenerics {
 
 export const ListNodeModelType: string = 'ListNodeModel';
 
+/**
+ * Node type used in GraphQL diagrams. It's a list node that contains list items.
+ * Each item can have an in port and an out port. The node itself can have one in 
+ * port and one out port. Each port can have many links anchored.
+ */
 export class ListNodeModel
   extends DefaultNodeModel
   implements WithInOutPorts, Hideable, DiagramElement

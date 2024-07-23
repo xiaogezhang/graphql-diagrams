@@ -7,6 +7,11 @@ export interface DragCanvasStateOptions {
   allowDrag?: boolean;
 }
 
+/**
+ * This is code from the lib "react-diagrams". There's bug in the code so I have to
+ * make a copy and fix here, as the fix I submitted to "react-diagrams" repository
+ * gets no response
+ */
 export class DragCanvasState<
   E extends CanvasEngine = CanvasEngine,
 > extends AbstractDisplacementState<E> {

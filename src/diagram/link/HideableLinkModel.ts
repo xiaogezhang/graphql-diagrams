@@ -10,6 +10,9 @@ import {ListNodeModel} from '../node/ListNodeModel';
 
 export const HideableLinkModelType: string = 'HideableLinkModel';
 
+/**
+ * Simple extension to the default link model to make it hideable.
+ */
 export class HideableLinkModel
   extends DefaultLinkModel
   implements DiagramElement, Hideable

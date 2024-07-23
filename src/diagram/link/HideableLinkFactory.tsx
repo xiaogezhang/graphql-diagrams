@@ -9,6 +9,10 @@ import {
 import {HideableLinkModel, HideableLinkModelType} from './HideableLinkModel';
 import {HideableWidget} from '../core/HideableWidget';
 
+/**
+ * Factory to create the type of links used in GraphQL diagrams. It's registered in 
+ * the engine for our diagram
+ */
 export class HideableLinkFactory<
   Link extends HideableLinkModel = HideableLinkModel,
 > extends DefaultLinkFactory<Link> {

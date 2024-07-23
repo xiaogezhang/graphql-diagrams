@@ -9,6 +9,11 @@ import {
 import { DiagramEngine, DragDiagramItemsState, DragNewLinkState, PortModel } from '@projectstorm/react-diagrams';
 import { DragCanvasState } from './DragCanvasState';
 
+/**
+ * This is code from the lib "react-diagrams". There's bug in the code so I have to
+ * make a copy and fix here, as the fix I submitted to "react-diagrams" repository
+ * gets no response
+ */
 export class DefaultDiagramState extends State<DiagramEngine> {
   dragCanvas: DragCanvasState;
   dragNewLink: DragNewLinkState;

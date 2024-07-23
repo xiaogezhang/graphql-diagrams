@@ -20,6 +20,9 @@ import { LeftAndRightListItemFactory, SimpleTextListItemFactory } from './list/I
 import { DefaultDiagramState } from './states/DefaultDiagramState';
 import { HideableLinkFactory } from './link/HideableLinkFactory';
 
+/**
+ * Engine used for GraphQL diagrams. Registered necessary factories.
+ */
 export class DefaultDiagramEngine extends DiagramEngine {
   protected itemFactories: FactoryBank<
     AbstractModelFactory<

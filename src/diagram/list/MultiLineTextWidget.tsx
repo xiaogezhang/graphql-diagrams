@@ -46,6 +46,14 @@ export interface MultiLineTextProps {
   content: MultiLineText;
 }
 
+/**
+ * React component to render multiple lines of text. The text may contain clickable targets
+ * which are marked by place holders in the format ${var_name}. They are replaced with real 
+ * values at rendering time.
+ * 
+ * @param props 
+ * @returns 
+ */
 function LineComponent(props: {
   color?: string;
   line: string;
