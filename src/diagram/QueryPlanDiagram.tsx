@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import {Alert, CircularProgress} from '@mui/material';
+import {Alert} from '@mui/material';
 
 import Canvas from './Canvas';
 import {useQueryPlanGraph} from './graphql/queryPlan/QueryPlanGraph';
@@ -10,8 +10,8 @@ import DiagramContext, {DiagramContextType} from './DiagramContext';
 import {ClickableTarget} from './list/ClickableText';
 import DepthContext from './DepthContext';
 import OutsideClickObserver from './core/hooks';
-import SchemaDiagram from './SchemaDiagram';
-import ExpandableContainer from './core/ExpndableContainer';
+import SchemaDiagramComponent from './SchemaDiagramComponent';
+import LoadingComponent from './core/LoadingComponent';
 
 namespace Styled {
   export const Loading = styled.div`
@@ -57,7 +57,7 @@ namespace Styled {
     border-radius: 4px;
     &:hover {
       cursor: pointer;
-      background-color: Lime;
+      background-color: LightGray;
       span {
         visibility: visible;
       }
@@ -82,20 +82,6 @@ namespace Styled {
     margin-left: -20px;
     z-index: 100;
   `;
-}
-
-function LoadingComponent(props: {close?: () => void}) {
-  const {close} = props;
-  return (
-    <Styled.Loading>
-      <CircularProgress />
-      {close ? (
-        <Styled.Button onClick={close}>
-          X<Styled.Tooltip>Close</Styled.Tooltip>
-        </Styled.Button>
-      ) : null}
-    </Styled.Loading>
-  );
 }
 
 type SubgraphDimension = {
@@ -291,34 +277,29 @@ function QueryPlanDiagramIntern(props: {
                   {error}
                 </Alert>
               </OutsideClickObserver>
-            ) : schema ? (
-              <ExpandableContainer
+            ) : 
+              <SchemaDiagramComponent
                 backgroundColor="rgb(220, 230, 220)"
                 collapseOnClickOutside={true}
                 header={
-                  <Styled.Header>
-                    <Styled.Title>
-                      Subgraph: <Styled.Name>{subgraph}</Styled.Name>
-                    </Styled.Title>
-                    <Styled.Button onClick={closeAction}>
-                      X<Styled.Tooltip>Close</Styled.Tooltip>
-                    </Styled.Button>
-                  </Styled.Header>
+                  <Styled.Title>
+                    Subgraph: <Styled.Name>{subgraph}</Styled.Name>
+                  </Styled.Title>
                 }
                 startAsExpanded={expanded}
                 expandedOpacity={0.98}
                 expanded={expandAction}
-                headerClassName="handle">
-                <SchemaDiagram sdl={schema} showOptions={expanded} />
-              </ExpandableContainer>
-            ) : (
-              <LoadingComponent close={closeAction} />
-            )}
+                headerClassName="handle"
+                sdl={schema}
+                showOptions={expanded}
+                close={closeAction}
+              />
+            }
           </ViewportComponent>
         </DepthContext.Provider>
       ) : null}
     </>
   ) : (
-    <LoadingComponent />
+    <LoadingComponent close={closeAction}/>
   );
 }

@@ -9,6 +9,10 @@ import DepthContext from './diagram/DepthContext';
 import GraphQLContext from './diagram/graphql/GraphQLContext';
 import Viewport from './diagram/Viewport';
 import SidePane from './diagram/side/SidePane';
+import SchemaDiagramComponent from './diagram/SchemaDiagramComponent';
+import LoadingComponent from './diagram/core/LoadingComponent';
+import DocumentView from './diagram/documents/DocumentView';
+import WithTooltip from './diagram/core/WithTooltip';
 
 export {type Anchor, useClickOutside, useResize} from './diagram/core/hooks';
 
@@ -78,5 +82,20 @@ export {getTextColor} from './diagram/utils/color';
 
 export {type TreeNode, type LayoutConfig, layout} from './diagram/layout';
 
-export {Canvas, DepthContext, DiagramContext, GraphQLContext, ExpandableContainer, SchemaDiagram, OutsideClickObserver, ListNodeWidget, QueryPlanDiagram, SidePane, Viewport} ;
-
+export {
+    Canvas, 
+    DepthContext, 
+    DiagramContext, 
+    DocumentView,
+    GraphQLContext, 
+    ExpandableContainer, 
+    LoadingComponent,
+    SchemaDiagram, 
+    SchemaDiagramComponent,
+    OutsideClickObserver, 
+    ListNodeWidget, 
+    QueryPlanDiagram, 
+    SidePane, 
+    Viewport,
+    WithTooltip,
+} ;

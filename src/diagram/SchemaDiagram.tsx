@@ -38,15 +38,17 @@ namespace Styled {
   `;
 }
 
+export type SchemaDiagramProps = {
+  sdl?: string;
+  displayOptions?: HiddenDisplayOptions;
+  showOptions?: boolean;
+};
+
 /**
  * React component for GraphQL schema diagram. Also contains display options such as show/hide 
  * inheritance, show/hide input object types etc.
  */
-export default function SchemaDiagram(props: {
-  sdl?: string;
-  displayOptions?: HiddenDisplayOptions;
-  showOptions?: boolean;
-}) {
+export default function SchemaDiagram(props: SchemaDiagramProps) {
   const {sdl, displayOptions, showOptions} = props;
   const {engine, nodeCount} = useGraphQLTypeGraph(sdl);
   const diagramContext = useContext(DiagramContext);

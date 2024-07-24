@@ -5,6 +5,7 @@ import tinycolor from 'tinycolor2';
 import OutsideClickObserver from './hooks';
 import DepthContext from '../DepthContext';
 import '../Diagram.css';
+import WithTooltip from './WithTooltip';
 
 namespace Styled {
   export const Container = styled.div<{
@@ -42,28 +43,8 @@ namespace Styled {
     border-radius: 4px;
     &:hover {
       cursor: pointer;
-      background-color: Lime;
-      span { visibility: visible; }
+      background-color: LightGray;
     }
-  `;
-
-  export const Tooltip = styled.span`
-    visibility: hidden;
-    background-color: white;
-    color: #333;
-    text-align: center;
-    border-radius: 5px;
-    padding: 4px;
-    padding-left: 8px;
-    padding-right: 8px;
-    font-size: 14px;
-    box-shadow: 2px 2px 1px silver;
-
-    /* Position the tooltip */
-    position: absolute;
-    margin-top: 40px;
-    margin-left: -20px;
-    z-index: 100;
   `;
 
   export const Header = styled.div<{
@@ -73,7 +54,7 @@ namespace Styled {
     background-color: ${(p) =>
       p.backgroundColor ?? (p.expanded ? 'rgb(225, 225, 225)' : 'inherit')};
     padding-left: 16px;
-    padding-right: 16px;
+    padding-right: 8px;
     padding-top: 4px;
     display: flex;
     flex-direction: row;
@@ -129,16 +110,17 @@ export default function ExpandableContainer(props: React.PropsWithChildren<Expan
   const headerComponent = (
     <Styled.Header className={headerClassName} expanded={expanded} backgroundColor={headerBackground}>
       {expanded ? (
-        <Styled.Button onClick={() => componentExpanded(!expanded)}>
-          &#9196;
-          <Styled.Tooltip>Collapse</Styled.Tooltip>
-        </Styled.Button>
+        <WithTooltip title="Collapse">
+          <Styled.Button onClick={() => componentExpanded(!expanded)}>
+            &#9196;
+          </Styled.Button>
+        </WithTooltip>
       ) : (
-        <Styled.Button
-          onClick={() => componentExpanded(!expanded)}>
-          &#9195;
-          <Styled.Tooltip>Expand</Styled.Tooltip>
-        </Styled.Button>
+        <WithTooltip title="Expand">
+          <Styled.Button onClick={() => componentExpanded(!expanded)}>
+            &#9195;
+          </Styled.Button>
+        </WithTooltip>
       )}
       {header}
     </Styled.Header>

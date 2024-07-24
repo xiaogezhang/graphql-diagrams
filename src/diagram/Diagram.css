@@ -6,7 +6,7 @@
   border-radius: 4px;
   &:hover {
     cursor: pointer;
-    background-color: Lime;
+    background-color: LightGray;
   }
 }
 

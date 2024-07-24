@@ -2,10 +2,21 @@ import React from 'react';
 
 export type Anchor = 'left' | 'right' | 'top' | 'bottom';
 
+/**
+ * Hook to use as resizing callback with mouse event. It saves starting position and set state to be
+ * resizing when mouse down on the dragger, updating the position when mouse moving in resizing state,
+ * and update the component size when mouse is up and in resizing state.
+ * 
+ * @param anchor if the component is anchored to the right, then the dragger is on the left, etc
+ * @param initialSize initial size of the component that changes size
+ * @param minSize minimal size. If not given, will use 0.
+ * @returns 
+ */
 export function useResize(
   anchor: Anchor,
   initialSize: number,
   minSize?: number,
+  maxSize?: number,
 ) {
   const [size, setSize] = React.useState<number>(initialSize);
   const [resizingStatus, setResizingStatus] = React.useState<{
@@ -44,7 +55,9 @@ export function useResize(
         const delta = resizingStatus.startingCoord ? curCoord - resizingStatus.startingCoord : 0;
         const newSize = anchor === 'right' || anchor === 'bottom' ? size - delta : size + delta;
         if (newSize >= (minSize ?? 0)) {
-          setSize(newSize);
+          if (!maxSize || newSize <= maxSize) {
+            setSize(newSize);
+          }
         }
         setResizingStatus(prev => ({
           ...prev,
@@ -52,7 +65,7 @@ export function useResize(
         }))
       }
     },
-    [anchor, size, minSize, resizingStatus, setSize],
+    [anchor, size, minSize, maxSize, resizingStatus, setSize],
   );
 
   React.useEffect(() => {

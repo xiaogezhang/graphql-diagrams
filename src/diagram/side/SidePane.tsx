@@ -1,6 +1,7 @@
 import React from 'react';
-import {Anchor, useResize} from '../core/hooks';
 import styled from '@emotion/styled';
+import tinycolor from 'tinycolor2';
+import {Anchor, useResize} from '../core/hooks';
 import DepthContext from '../DepthContext';
 
 const DraggerSize: number = 4;
@@ -37,20 +38,42 @@ namespace Styled {
 
   export const Dragger = styled.div<{
     anchor?: Anchor;
+    backgroundColor?: string;
   }>`
     position: absolute;
+    background-color: ${(p) => p.backgroundColor ?? 'inherit'};
     top: ${(p) =>
-      p.anchor === 'left' || p.anchor === 'right' ? '0' : (p.anchor === 'bottom' ? '0' : undefined)};
+      p.anchor === 'left' || p.anchor === 'right'
+        ? '0'
+        : p.anchor === 'bottom'
+        ? '0'
+        : undefined};
     bottom: ${(p) =>
-      p.anchor === 'left' || p.anchor === 'right' ? '0' : (p.anchor === 'top' ? '0' : undefined)};
+      p.anchor === 'left' || p.anchor === 'right'
+        ? '0'
+        : p.anchor === 'top'
+        ? '0'
+        : undefined};
     left: ${(p) =>
-      p.anchor === 'top' || p.anchor === 'bottom' ? '0' : (p.anchor === 'right' ? '0' : undefined)};
+      p.anchor === 'top' || p.anchor === 'bottom'
+        ? '0'
+        : p.anchor === 'right'
+        ? '0'
+        : undefined};
     right: ${(p) =>
-      p.anchor === 'top' || p.anchor === 'bottom' ? '0' : (p.anchor === 'left' ? '0' : undefined)};
+      p.anchor === 'top' || p.anchor === 'bottom'
+        ? '0'
+        : p.anchor === 'left'
+        ? '0'
+        : undefined};
     width: ${(p) =>
-      p.anchor === 'left' || p.anchor === 'right' ? (DraggerSize + 'px') : undefined};
+      p.anchor === 'left' || p.anchor === 'right'
+        ? DraggerSize + 'px'
+        : undefined};
     height: ${(p) =>
-      p.anchor === 'top' || p.anchor === 'bottom' ? (DraggerSize + 'px') : undefined};
+      p.anchor === 'top' || p.anchor === 'bottom'
+        ? DraggerSize + 'px'
+        : undefined};
     cursor: ${(p) =>
       p.anchor === 'left' || p.anchor === 'right'
         ? 'col-resize'
@@ -76,16 +99,28 @@ export type SidePaneProps = {
   anchor?: Anchor;
   size?: number;
   minSize?: number;
+  maxSize?: number;
   backgroundColor?: string;
   opacity?: number;
 };
 
+/**
+ * Side pane can stick to one of four anchors of the parent component: left, right, top, bottom
+ * A dragger bar can be dragged to change the size of the side pane. 
+ * 
+ * This is different from drawer in that it's floating above the other components, not share the 
+ * space. 
+ * 
+ * @param props 
+ * @returns 
+ */
 export default function SidePane(
   props: React.PropsWithChildren<SidePaneProps>,
 ) {
   const {
     size: initSize,
     minSize,
+    maxSize,
     backgroundColor,
     anchor,
     opacity,
@@ -95,8 +130,11 @@ export default function SidePane(
     anchor ?? 'right',
     initSize ?? DefaultSidePaneSize,
     minSize,
+    maxSize,
   );
   const depth = React.useContext(DepthContext);
+  const draggerColor = backgroundColor ? tinycolor(backgroundColor).darken(5).toRgbString()
+    : backgroundColor;
 
   return anchor === 'left' || anchor === 'top' ? (
     <Styled.Pane
@@ -105,8 +143,14 @@ export default function SidePane(
       backgroundColor={backgroundColor}
       opacity={opacity}
       depth={depth + 1}>
-      <Styled.Content anchor={anchor} opacity={opacity}>{children}</Styled.Content>
-      <Styled.Dragger anchor={anchor} onMouseDown={enableResize} />
+      <Styled.Content anchor={anchor} opacity={opacity}>
+        {children}
+      </Styled.Content>
+      <Styled.Dragger
+        anchor={anchor}
+        backgroundColor={draggerColor}
+        onMouseDown={enableResize}
+      />
     </Styled.Pane>
   ) : (
     <Styled.Pane
@@ -115,8 +159,14 @@ export default function SidePane(
       backgroundColor={backgroundColor}
       opacity={opacity}
       depth={depth + 1}>
-      <Styled.Dragger anchor={anchor} onMouseDown={enableResize}/>
-      <Styled.Content anchor={anchor} opacity={opacity}>{children}</Styled.Content>
+      <Styled.Dragger
+        anchor={anchor}
+        backgroundColor={draggerColor}
+        onMouseDown={enableResize}
+      />
+      <Styled.Content anchor={anchor} opacity={opacity}>
+        {children}
+      </Styled.Content>
     </Styled.Pane>
   );
 }
