@@ -12,26 +12,28 @@ namespace Styled {
     backgroundColor?: string;
     opacity?: number;
     depth?: number;
+    fullscreen?: boolean;
   }>`
     position: absolute;
-    left: ${(p) => (p.anchor === 'right' ? undefined : '0')};
-    right: ${(p) => (p.anchor === 'left' ? undefined : '0')};
-    top: ${(p) => (p.anchor === 'bottom' ? undefined : '0')};
-    bottom: ${(p) => (p.anchor === 'top' ? undefined : '0')};
+    left: ${(p) => (p.fullscreen ? '0' : (p.anchor === 'right' ? undefined : '0'))};
+    right: ${(p) => (p.fullscreen ? '0' : (p.anchor === 'left' ? undefined : '0'))};
+    top: ${(p) => (p.fullscreen ? '0' : (p.anchor === 'bottom' ? undefined : '0'))};
+    bottom: ${(p) => (p.fullscreen ? '0' : (p.anchor === 'top' ? undefined : '0'))};
     display: flex;
     background-color: ${(p) => p.backgroundColor ?? 'inherit'};
     flex-direction: ${(p) =>
       p.anchor === 'left' || p.anchor === 'right' ? 'row' : 'column'};
+    justify-content: space-between;
     opacity: ${(p) => p.opacity ?? '1'};
     overflow: hidden;
-    width: ${(p) =>
+    width: ${(p) => p.fullscreen ? undefined : (
       p.anchor === 'left' || p.anchor === 'right'
         ? p.size ?? 'auto'
-        : undefined};
-    height: ${(p) =>
+        : undefined)};
+    height: ${(p) => p.fullscreen ? undefined : (
       p.anchor === 'top' || p.anchor === 'bottom'
         ? p.size ?? 'auto'
-        : undefined};
+        : undefined)};
     z-index: ${(p) => (p.depth ? p.depth : 'auto')};
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   `;
@@ -40,32 +42,8 @@ namespace Styled {
     anchor?: Anchor;
     backgroundColor?: string;
   }>`
-    position: absolute;
     background-color: ${(p) => p.backgroundColor ?? 'inherit'};
-    top: ${(p) =>
-      p.anchor === 'left' || p.anchor === 'right'
-        ? '0'
-        : p.anchor === 'bottom'
-        ? '0'
-        : undefined};
-    bottom: ${(p) =>
-      p.anchor === 'left' || p.anchor === 'right'
-        ? '0'
-        : p.anchor === 'top'
-        ? '0'
-        : undefined};
-    left: ${(p) =>
-      p.anchor === 'top' || p.anchor === 'bottom'
-        ? '0'
-        : p.anchor === 'right'
-        ? '0'
-        : undefined};
-    right: ${(p) =>
-      p.anchor === 'top' || p.anchor === 'bottom'
-        ? '0'
-        : p.anchor === 'left'
-        ? '0'
-        : undefined};
+    flex-grow: 1;
     width: ${(p) =>
       p.anchor === 'left' || p.anchor === 'right'
         ? DraggerSize + 'px'
@@ -76,28 +54,32 @@ namespace Styled {
         : undefined};
     cursor: ${(p) =>
       p.anchor === 'left' || p.anchor === 'right'
-        ? 'col-resize'
-        : 'row-resize'};
+        ? 'ew-resize'
+        : 'ns-resize'};
   `;
 
   export const Content = styled.div<{
     anchor?: Anchor;
     opacity?: number;
   }>`
-    position: absolute;
-    top: ${(p) => p.anchor === 'bottom' ? (DraggerSize + 'px') : '0'};
-    bottom: ${(p) => p.anchor === 'top'? (DraggerSize + 'px') : '0'};
-    left: ${(p) => p.anchor === 'right'? (DraggerSize + 'px') : '0'};
-    right: ${(p) => p.anchor === 'left'? (DraggerSize + 'px') : '0'};
     opacity: ${(p) => p.opacity ?? '1'};
+    width: ${(p) =>
+      p.anchor === 'left' || p.anchor === 'right'
+        ? 'calc(100% - ' + DraggerSize + 'px)'
+        : undefined};
+    height: ${(p) =>
+      p.anchor === 'top' || p.anchor === 'bottom'
+        ? 'calc(100% - ' + DraggerSize + 'px)'
+        : undefined};
   `;
 }
 
-const DefaultSidePaneSize: number = 100;
+const DefaultSidePaneSize: number = 150;
 
 export type SidePaneProps = {
   anchor?: Anchor;
   size?: number;
+  fullscreen?: boolean;
   minSize?: number;
   maxSize?: number;
   backgroundColor?: string;
@@ -119,6 +101,7 @@ export default function SidePane(
 ) {
   const {
     size: initSize,
+    fullscreen,
     minSize,
     maxSize,
     backgroundColor,
@@ -139,6 +122,7 @@ export default function SidePane(
   return anchor === 'left' || anchor === 'top' ? (
     <Styled.Pane
       anchor={anchor}
+      fullscreen={fullscreen}
       size={size + 'px'}
       backgroundColor={backgroundColor}
       opacity={opacity}
@@ -155,6 +139,7 @@ export default function SidePane(
   ) : (
     <Styled.Pane
       anchor={anchor}
+      fullscreen={fullscreen}
       size={size + 'px'}
       backgroundColor={backgroundColor}
       opacity={opacity}

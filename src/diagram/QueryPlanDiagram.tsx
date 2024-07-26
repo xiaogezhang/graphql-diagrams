@@ -287,11 +287,13 @@ function QueryPlanDiagramIntern(props: {
                   </Styled.Title>
                 }
                 startAsExpanded={expanded}
-                expandedOpacity={0.98}
+                expandedOpacity={1}
                 expanded={expandAction}
                 headerClassName="handle"
                 sdl={schema}
+                schemaName={subgraph}
                 showOptions={expanded}
+                showDocExplorer={true}
                 close={closeAction}
               />
             }

@@ -1,6 +1,6 @@
 import SchemaDiagram from './diagram/SchemaDiagram';
 import OutsideClickObserver from './diagram/core/hooks';
-import ExpandableContainer from './diagram/core/ExpndableContainer';
+import ExpandableContainer from './diagram/core/ExpandableContainer';
 import ListNodeWidget from './diagram/node/ListNodeWidget';
 import QueryPlanDiagram from './diagram/QueryPlanDiagram';
 import Canvas from './diagram/Canvas';

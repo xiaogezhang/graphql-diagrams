@@ -17,7 +17,9 @@ namespace Styled {
     expandedHeight?: string;
     depth: number;
   }>`
-    position: ${(p) => (p.expanded ? (p.expandedPosition ?? 'fixed') : 'inherit')};
+    position: ${(p) => (p.expanded ? (p.expandedPosition ?? 'fixed') : 'relative')};
+    display: flex;
+    flex-direction: column;
     top: 0;
     left: 0;
     right: 0;
@@ -43,7 +45,7 @@ namespace Styled {
     border-radius: 4px;
     &:hover {
       cursor: pointer;
-      background-color: LightGray;
+      background-color: rgba(0,0,0,0.1);
     }
   `;
 
@@ -60,6 +62,10 @@ namespace Styled {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+  `;
+
+  export const Content = styled.div`
+    height: 100%;
   `;
 }
 
@@ -139,7 +145,9 @@ export default function ExpandableContainer(props: React.PropsWithChildren<Expan
         expandedWidth={expandedWidth}
         depth={depth}>
         {headerComponent}
-        {props.children}  
+        <Styled.Content>
+          {props.children}
+        </Styled.Content>  
       </Styled.Container>
     </OutsideClickObserver>
   </DepthContext.Provider>;

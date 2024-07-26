@@ -1,14 +1,17 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import tinycolor from 'tinycolor2';
-import ExpandableContainer, { ExpandableContainerProps } from './core/ExpndableContainer';
-import SchemaDiagram, { SchemaDiagramProps } from './SchemaDiagram';
+import ExpandableContainer, {
+  ExpandableContainerProps,
+} from './core/ExpandableContainer';
+import SchemaDiagram, {SchemaDiagramProps} from './SchemaDiagram';
 import SidePane from './side/SidePane';
 import DocumentView from './documents/DocumentView';
 import MenuIcon from '../icons/menu.svg';
 import CloseIcon from '../icons/close.svg';
 import LoadingComponent from './core/LoadingComponent';
 import WithTooltip from './core/WithTooltip';
+import SimpleSchemaEditor from './documents/SimpleSchemaEditor';
 
 namespace Styled {
   export const Header = styled.div`
@@ -33,7 +36,6 @@ namespace Styled {
     width: max-content;
     padding: 4px;
     margin-right: 24px;
-    column-gap: 16px;
   `;
 
   export const Name = styled.div`
@@ -47,18 +49,21 @@ namespace Styled {
     border-radius: 4px;
     &:hover {
       cursor: pointer;
-      background-color: LightGray;
+      background-color: rgba(0, 0, 0, 0.1);
     }
   `;
 }
 
-export type SchemaDiagramComponentProps = ExpandableContainerProps & SchemaDiagramProps & {
-  schemaName?: string;
-  showDocExplorer?: boolean;
-  close?: () => void;
-};
+export type SchemaDiagramComponentProps = ExpandableContainerProps &
+  SchemaDiagramProps & {
+    schemaName?: string;
+    showDocExplorer?: boolean;
+    close?: () => void;
+  };
 
-export default function SchemaDiagramComponent(props: SchemaDiagramComponentProps) {
+export default function SchemaDiagramComponent(
+  props: SchemaDiagramComponentProps,
+) {
   const {
     startAsExpanded,
     expanded,
@@ -77,9 +82,8 @@ export default function SchemaDiagramComponent(props: SchemaDiagramComponentProp
     expandedHeight,
     headerClassName,
   } = props;
-  const [docExplorerOpen, setDocExplorerOpen] = React.useState<boolean>(
-    showDocExplorer ?? false,
-  );
+  const [docExplorerOpen, setDocExplorerOpen] = React.useState<boolean>(false);
+  const [docFullscreen, setDocFullscreen] = React.useState<boolean>(false);
 
   return sdl ? (
     <ExpandableContainer
@@ -92,15 +96,23 @@ export default function SchemaDiagramComponent(props: SchemaDiagramComponentProp
         <Styled.Header>
           {header ?? (
             <Styled.Title>
-              Schema <Styled.Name>{schemaName}</Styled.Name>
+              Schema (<Styled.Name>{schemaName}</Styled.Name>)
             </Styled.Title>
           )}
           <Styled.Buttons>
-            <WithTooltip title="Document Explorer">
-              <Styled.Button onClick={() => setDocExplorerOpen(!docExplorerOpen)}>
-                <img width="28" height="28" src={MenuIcon} alt="Document Explorer"/>
-              </Styled.Button>
-            </WithTooltip>
+            {showDocExplorer && (
+              <WithTooltip title="Document Explorer">
+                <Styled.Button
+                  onClick={() => setDocExplorerOpen(!docExplorerOpen)}>
+                  <img
+                    width="28"
+                    height="28"
+                    src={MenuIcon}
+                    alt="Document Explorer"
+                  />
+                </Styled.Button>
+              </WithTooltip>
+            )}
             <WithTooltip title="Close">
               <Styled.Button onClick={close}>
                 <img width="28" height="28" src={CloseIcon} alt="Close" />
@@ -118,16 +130,29 @@ export default function SchemaDiagramComponent(props: SchemaDiagramComponentProp
         displayOptions={displayOptions}
         showOptions={showOptions}
       />
-      {docExplorerOpen ? (
-        <SidePane size={400} minSize={40} backgroundColor="white" anchor="right">
-          <DocumentView 
-            close={() => setDocExplorerOpen(false)} 
-            backgroundColor={tinycolor('LightBlue').lighten(15).toRgbString()}
-          /> 
+      {showDocExplorer && docExplorerOpen ? (
+        <SidePane
+          size={400}
+          minSize={40}
+          fullscreen={docFullscreen}
+          backgroundColor="white"
+          anchor="right">
+          <DocumentView
+            fullscreen={docFullscreen}
+            setFullscreen={setDocFullscreen}
+            close={() => setDocExplorerOpen(false)}
+            header={
+              <Styled.Title>
+                Schema (<Styled.Name>{schemaName}</Styled.Name>)
+              </Styled.Title>
+            }
+            backgroundColor={tinycolor('LightBlue').lighten(15).toRgbString()}>
+            <SimpleSchemaEditor disabled={true} sdl={sdl}/>
+          </DocumentView>
         </SidePane>
       ) : null}
     </ExpandableContainer>
   ) : (
-    <LoadingComponent close={close}/>
+    <LoadingComponent close={close} />
   );
 }
